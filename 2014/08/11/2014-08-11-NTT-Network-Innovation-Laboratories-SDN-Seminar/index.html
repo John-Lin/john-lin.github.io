@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html>
+    
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="John&#39;s Lin Blog">
+    <title>NTT 未來網路研究所 SDN 研討會 - John&#39;s Lin Blog</title>
+    <meta name="author" content="John Lin">
+    <meta name="description" content="John&#39;s Lin Blog">
+    <link rel="icon" href="/assets/images/favicon.ico">
+    
+        <link rel="alternative" type="application/atom+xml" title="RSS" href="atom.xml">
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style.min.css" type="text/css">
+    <!--STYLES END-->
+    
+    <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-47712773-1']);
+        _gaq.push(['_trackPageview']);
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+
+</head>
+
+    <body>
+        <div id="blog">
+            <header id="header">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars "></i>
+    <h1 class="header-title">
+        <a class="header-title-link" href="http://linton.tw">John&#39;s Lin Blog</a>
+    </h1>
+    
+        <a class="header-picture-link" href="/#about">
+            <img class="header-picture" src="http://www.gravatar.com/avatar/98b5759510e487ade4145247bc856366?s=90"/>
+        </a>
+    
+</header>
+            <nav id="sidebar">
+    
+        <div class="sidebar-profile">
+            <a href="/#about">
+                
+                    <img class="sidebar-profile-picture" src="http://www.gravatar.com/avatar/98b5759510e487ade4145247bc856366?s=90"/>
+                
+            </a>
+            <span class="sidebar-profile-name hide-md">John Lin</span>
+        </div>
+    
+    
+        <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+                        <span class="sidebar-button-desc hide-md">Home</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/all-categories">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+                        <span class="sidebar-button-desc hide-md">Categories</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/all-tags">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+                        <span class="sidebar-button-desc hide-md">Tags</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/all-archives">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+                        <span class="sidebar-button-desc hide-md">Archives</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/#about">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+                        <span class="sidebar-button-desc hide-md">About me</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://m103.nthu.edu.tw/~s103064502/" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-file-text"></i>
+                        <span class="sidebar-button-desc hide-md">Résumé</span>
+                    </a>
+                </li>
+            
+        </ul>
+    
+        <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="https://github.com/John-Lin/" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+                        <span class="sidebar-button-desc hide-md">GitHub</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="https://twitter.com/Linton_tw" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-twitter"></i>
+                        <span class="sidebar-button-desc hide-md">Twitter</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="mailto:// linton.tw@gmail.com" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-envelope-o"></i>
+                        <span class="sidebar-button-desc hide-md">Mail</span>
+                    </a>
+                </li>
+            
+        </ul>
+    
+        <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/atom.xml">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+                        <span class="sidebar-button-desc hide-md">RSS</span>
+                    </a>
+                </li>
+            
+        </ul>
+    
+</nav>
+            <div id="main">
+                
+<article class="post" itemscope itemType="http://schema.org/BlogPosting">
+    
+        <div class="post-header main-content-wrap">
+    
+        <h1 class="post-title" itemprop="headline">NTT 未來網路研究所 SDN 研討會</h1>
+    
+    <div class="post-meta">
+    <time  itemprop="datePublished" content="Mon Aug 11 2014 01:29:02 GMT+0800">
+        Aug 11, 2014
+    </time>
+    
+</div>
+</div>
+    
+    <div class="post-content markdown main-content-wrap" itemprop="articleBody">
+        <p><a href="https://www.flickr.com/photos/linton-flickr/14691549400" title="NTT_SDN by 哲緯 林, on Flickr" target="_blank" rel="external"><img src="https://farm4.staticflickr.com/3879/14691549400_3c4081057c_z.jpg" width="640" height="478" alt="NTT_SDN"></a></p>
+<h3 id="前言">前言</h3><hr>
+<p>這次有幸參加 NTT 研究所 SDN 研討會，這場研討會是第一屆辦在台灣，直接聽 <a href="http://osrg.github.io/ryu/" target="_blank" rel="external">Ryu</a> 的主要開發者來介紹 Ryu 可以說是機會難得啊！總共有兩場一場在臺北的資策會，另一場則在新竹交大的浩然圖書館。議程的內容分為上午場的 Lagopus/Ryu 介紹 及下午場的 Lagopus/Ryu 研習操作。</p>
+<p>另外這次也聽到關於 <a href="http://Lagopus.github.io/" target="_blank" rel="external">Lagopus</a> 的介紹，這是一款專門為 OpenFlow 協定所造的 Virtual Switch 目前雖是 Alpha 版本，但對 OpenFlow 協定支援度是目前最高，更利用 <a href="http://dpdk.org/" target="_blank" rel="external">Intel DPDK</a> 技術做到快速處理封包的功能。</p>
+<a id="more"></a>
+<p>先來看一段官方的介紹：</p>
+<blockquote>
+<p>Intel® DPDK is a set of libraries and drivers for fast packet processing on x86 platforms. It runs mostly in Linux userland.</p>
+</blockquote>
+<h3 id="Ryu_介紹">Ryu 介紹</h3><hr>
+<p><a href="https://www.flickr.com/photos/linton-flickr/14875634784" title="LogoSet02 by 哲緯 林, on Flickr" target="_blank" rel="external"><img src="https://farm4.staticflickr.com/3851/14875634784_bea4b05ca8_n.jpg" width="320" height="249" alt="LogoSet02"></a></p>
+<p>這部分由 Ryu 的 Project lead FUJITA桑 來介紹（常在 Mailing List 上看到他），因為整個議程的時間並不長，並沒有很深入的去詳述一些程式的架構或流程，以及開發應用程式的細節，主要還是以一個較為較一般的介紹，但是我還是希望未來若還有機會能辦第二屆或許可以做更深入的討論。</p>
+<h4 id="OpenStack-Integration">OpenStack-Integration</h4><p>另外，我覺得這次的 Ryu 的演講都是專注在與 <a href="http://www.openstack.org/" target="_blank" rel="external">OpenStack</a> 的整合，包括 SDN 到底在 OpenStack 上扮演什麼樣的角色？以及他們團隊在開發與 OpenStack 上遇到什麼樣的挑戰，例如 Scalability 與 Availability 的問題，諸如此類。</p>
+<h4 id="Snort-Integration">Snort-Integration</h4><p>但是我其實更關注 Ryu 與 Snort 的整合，這部分其實早在2013的3月 Ryu 就有 Fork 出一個專案是關於 Snort-Integration 但是不知道為什麼後來就沒有更新，連帶的 GitHub 的專案網址就消失了，本次我也有問 FUJITA桑 關於這件事，他說請我聯絡他，他會寄給我專案資料包括 source code 最後我拿到但是這份 source code 我執行後發現他還是停在 Ryu 1.8 版本，已經落後目前的版本許久，且並不支援OpenFlow 1.3</p>
+<h3 id="Lagopus_介紹">Lagopus 介紹</h3><hr>
+<p><a href="https://www.flickr.com/photos/linton-flickr/14877910465" title="lagopus by 哲緯 林, on Flickr" target="_blank" rel="external"><img src="https://farm4.staticflickr.com/3891/14877910465_9707df8294_m.jpg" width="214" height="240" alt="lagopus"></a></p>
+<p>這個介紹是我最期待的一個部分，早在年初的時候就有聽到這個 Lagopus 專案的風聲，一款以軟體實作支援 OpenFlow 協定的虛擬交換器 (Virtual Switch) 其實就很像 <a href="http://openvswitch.org/" target="_blank" rel="external">Open vSwitch</a> 的專案在支持 OpenFlow 協定所做的事情。<br>Lagopus 其實是一隻叫做雷鳥的鳥類，他居住在海拔非常高的山上。開發者以一句話來形容他 <code>A bird in cloud</code> 我想這應該是要跟雲端接軌的一個 SDN 專案吧？</p>
+<h4 id="Intel_DPDK_(Data_Plane_Development_Kit)">Intel DPDK (Data Plane Development Kit)</h4><p>這款 Virtual Switch 最大的特色如前面所提的，它擁有 Intel DPDK 技術的支援，善用這個技術，可以做到快速處理封包的功能。看到這裡，大家心裡不免有些疑問？是不是需要有特定的硬體支援? 沒錯需要採用 Intel 的 CPU 跟 NIC (網路介面卡），但是在網卡部分也不全然需要 Intel 的。有興趣的朋友可以參考以下支援的硬體清單。</p>
+<ul>
+<li>Supported CPU: Intel Xeon E5, E3, Core i7, i5, i3, Atom </li>
+<li><a href="http://dpdk.org/doc/nics" target="_blank" rel="external">Supported NICs</a></li>
+</ul>
+<h4 id="Lagopus_inside_Switch">Lagopus inside Switch</h4><p>這次除了初步認識 Lagopus 之外，還有試著操作看看這套軟體，當然 NTT 這邊提供了已經裝好 Lagopus 支援 OpenFlow 的 Switch （這台是某一家公司提供的硬體上面已經裝好 Lagopus，未免廣告嫌疑XD 有興趣可以私信給我）目前據我所知僅可以裝在 CentOS 上，未來會支援 Debian/Ubuntu 我使用後發現了一些功能尚為較不完善的地方，例如: 加入或移除 flow entry 僅能以 controller 這邊去操控，不能直接透過 Switch 下指令進行操作，這部分在 OpenvSwitch 可以直接用指令做到。說了這麼多缺點也該來說一下優點，它是目前我看到以軟體實做的 switch 支援 OpenFlow 功能最完善的一款 Vswitch 此外它也是目前效能最高的一款 Vswitch 可以參考稍後的比較圖。</p>
+<p><a href="https://www.flickr.com/photos/linton-flickr/14855056846" title="Lagopus-Taiwan-20140805 by 哲緯 林, on Flickr" target="_blank" rel="external"><img src="https://farm6.staticflickr.com/5569/14855056846_f20d2b86b1_z.jpg" width="640" height="480" alt="Lagopus-Taiwan-20140805"></a></p>
+
+        
+            
+        
+    </div>
+    <div class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/Lagopus/">Lagopus</a> <a class="tag tag--primary tag--small t-link" href="/tags/OpenFlow/">OpenFlow</a> <a class="tag tag--primary tag--small t-link" href="/tags/Ryu/">Ryu</a> <a class="tag tag--primary tag--small t-link" href="/tags/SDN/">SDN</a>
+
+            </div>
+        
+        <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2014/08/17/2014-08-17-Install-Snort-from-source-on-Ubuntu/"  data-tooltip="Install Snort from source on Ubuntu">
+                
+                    <i class="fa fa-angle-left"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2014/08/08/2014-08-08-My-first-time-using-hexo/" data-tooltip="My first time using hexo">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://linton.tw/2014/08/11/2014-08-11-NTT-Network-Innovation-Laboratories-SDN-Seminar/">
+                <i class="fa fa-google-plus"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://linton.tw/2014/08/11/2014-08-11-NTT-Network-Innovation-Laboratories-SDN-Seminar/">
+                <i class="fa fa-facebook-official"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://linton.tw/2014/08/11/2014-08-11-NTT-Network-Innovation-Laboratories-SDN-Seminar/">
+                <i class="fa fa-twitter"></i>
+            </a>
+        </li>
+        
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                    <i class="fa fa-comment-o"></i>
+                </a>
+            </li>
+        
+    </ul>
+</div>
+
+
+        
+            <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2015 John Lin. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div class="post-bottom-bar">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2014/08/17/2014-08-17-Install-Snort-from-source-on-Ubuntu/"  data-tooltip="Install Snort from source on Ubuntu">
+                
+                    <i class="fa fa-angle-left"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2014/08/08/2014-08-08-My-first-time-using-hexo/" data-tooltip="My first time using hexo">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://linton.tw/2014/08/11/2014-08-11-NTT-Network-Innovation-Laboratories-SDN-Seminar/">
+                <i class="fa fa-google-plus"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://linton.tw/2014/08/11/2014-08-11-NTT-Network-Innovation-Laboratories-SDN-Seminar/">
+                <i class="fa fa-facebook-official"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://linton.tw/2014/08/11/2014-08-11-NTT-Network-Innovation-Laboratories-SDN-Seminar/">
+                <i class="fa fa-twitter"></i>
+            </a>
+        </li>
+        
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                    <i class="fa fa-comment-o"></i>
+                </a>
+            </li>
+        
+    </ul>
+</div>
+
+
+                </div>
+            
+        </div>
+        <div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-remove"></i>
+        </div>
+        
+            <img id="about-card-picture" src="http://www.gravatar.com/avatar/98b5759510e487ade4145247bc856366?s=110"/>
+        
+            <h4 id="about-card-name">John Lin</h4>
+        
+            <h5 id="about-card-bio">Graduate student majoring in Communications Engineering at National Tsing Hua University (NTHU). My current research interests include the SDN/OpenFlow and network security with dynamic malware analysis. I am also interested in open source projects especially using Python and Node.js!</h5>
+        
+        
+            <h5 id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                Graduate student
+            </h5>
+        
+        
+            <h5 id="about-card-location">
+                <i class="fa fa-map-marker"></i>
+                <br/>
+                Taipei, Taiwan
+            </h5>
+        
+    </div>
+</div>
+        <div id="cover" style="background-image:url('/assets/images/cover.png');"></div>
+    </body>
+    <!--SCRIPTS-->
+<script src="/assets/js/script.min.js" type="text/javascript"></script>
+<!--SCRIPTS END-->
+
+    <script type="text/javascript">
+        var disqus_shortname = 'lintontw';
+        (function() {
+            var dsq = document.createElement('script');
+            dsq.type = 'text/javascript';
+            dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+
+
+</html>

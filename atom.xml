@@ -1,0 +1,1015 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title><![CDATA[John's Lin Blog]]></title>
+  <subtitle><![CDATA[Python / OpenFlow / Hack]]></subtitle>
+  <link href="/atom.xml" rel="self"/>
+  <link href="http://linton.tw/"/>
+  <updated>2015-03-21T18:11:02.000Z</updated>
+  <id>http://linton.tw/</id>
+  
+  <author>
+    <name><![CDATA[John Lin]]></name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title><![CDATA[Custom packet creation using Ryu and Scapy]]></title>
+    <link href="http://linton.tw/2015/03/22/2015-03-22-Custom-Packet-creation-using-Ryu-and-Scapy/"/>
+    <id>http://linton.tw/2015/03/22/2015-03-22-Custom-Packet-creation-using-Ryu-and-Scapy/</id>
+    <published>2015-03-21T17:02:18.000Z</published>
+    <updated>2015-03-21T18:11:02.000Z</updated>
+    <content type="html"><![CDATA[<p>最近在 Ryu 的 <a href="http://sourceforge.net/p/ryu/mailman/message/33611168/" target="_blank" rel="external">mailing list</a> 上看到這個問題，就順便分享一下如何在 Ryu Controller 下製造一個客製化封包傳給 OpenFlow Switch (device)</p>
+<h3 id="應用情境">應用情境</h3><p>假設你在 Controller 收到某個封包之後又或是在某個條件下，需要先產生一個封包並且使用 OpenFlow 的 Packet-Out message 傳給 Switch</p>
+<p>這裏有兩種方法，分別是利用 Ryu 與 Scapy 皆可以產生客製化封包，以下提供你參考<br><a id="more"></a></p>
+<h3 id="Ryu_Framework">Ryu Framework</h3><p>幾個步驟需要注意：</p>
+<ol>
+<li>利用 <code>ryu.lib.packet.packet.Packet</code> 產生一個物件 pkt</li>
+<li>利用 <code>pkt.add_protocol()</code> 堆疊各種網路協定像是(ethernet, ipv4, tcp)，並把每一層需要填入的資訊塞進去</li>
+<li>最後用 <code>pkt.serialize()</code> 包裝封包，checksum 會在這時候算好不用擔心</li>
+<li><code>pkt.data</code> 就會是整個封包的 Binary</li>
+<li>要確認有沒有把封包打包完整，可以用 pcaplib 存成 pcap 檔，可以用 Wireshark 做確認<br>pcaplib 是我之前寫的 patch 現在已經收錄進 Ryu project 使用方式可以參考之前寫這篇 <a href="http://linton.tw/2015/01/26/saving-captured-packets-in-ryu-controller/">Saving captured packets in Ryu controller</a></li>
+</ol>
+<figure class="highlight python"><figcaption><span>build_pkt_ryu.py</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> ryu.lib.packet <span class="keyword">import</span> packet</span><br><span class="line"><span class="keyword">from</span> ryu.lib.packet <span class="keyword">import</span> ethernet</span><br><span class="line"><span class="keyword">from</span> ryu.lib.packet <span class="keyword">import</span> ipv4</span><br><span class="line"><span class="keyword">from</span> ryu.lib.packet <span class="keyword">import</span> tcp</span><br><span class="line"><span class="keyword">from</span> ryu.lib <span class="keyword">import</span> pcaplib</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">build_pkt_ryu</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment"># Creat pcap file writer instance</span></span><br><span class="line">    pcap_pen = pcaplib.Writer(open(<span class="string">'pkt_build_from_ryu.pcap'</span>, <span class="string">'wb'</span>))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Creat an empty Packet instance</span></span><br><span class="line">    pkt = packet.Packet()</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Add ethernet protocol with ether type IP protocol and mac addresses</span></span><br><span class="line">    pkt.add_protocol(ethernet.ethernet(ethertype=<span class="string">'0x0800'</span>,</span><br><span class="line">                                       dst=<span class="string">'70:56:81:12:34:56'</span>,</span><br><span class="line">                                       src=<span class="string">'70:56:81:65:43:21'</span>))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment"># Add ipv4 protocol with IP addresses and TCP protocol which is 6</span></span><br><span class="line">    pkt.add_protocol(ipv4.ipv4(dst=<span class="string">'192.168.8.70'</span>,</span><br><span class="line">                               src=<span class="string">'192.168.8.50'</span>,</span><br><span class="line">              	               proto=<span class="number">6</span>))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Add tcp protocol with port numbers and sequence number</span></span><br><span class="line">    pkt.add_protocol(tcp.tcp(src_port=<span class="number">5566</span>,</span><br><span class="line">                             dst_port=<span class="number">8080</span>,</span><br><span class="line">                             seq=<span class="number">1234566</span>))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Packet serializing</span></span><br><span class="line">    pkt.serialize()</span><br><span class="line"></span><br><span class="line">    bin_packet = pkt.data</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Write to pcap file</span></span><br><span class="line">    pcap_pen.write_pkt(bin_packet)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    build_pkt_ryu()</span><br></pre></td></tr></table></figure>
+<h3 id="Scapy_Framework">Scapy Framework</h3><p>這是最簡單的方式作出封包，但是需要安裝 <a href="http://www.secdev.org/projects/scapy/" target="_blank" rel="external">Scapy</a> 的 package</p>
+<p>安裝方法</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo pip <span class="keyword">install</span> scapy</span><br></pre></td></tr></table></figure>
+<p>緊接著來做封包，用了 Scapy 十分容易</p>
+<figure class="highlight python"><figcaption><span>build_pkt_scapy.py</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> ryu.lib <span class="keyword">import</span> pcaplib</span><br><span class="line"><span class="keyword">from</span> scapy.all <span class="keyword">import</span> Ether, IP, TCP</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">build_pkt_scapy</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment"># Creat pcap file writer instance</span></span><br><span class="line">    pcap_pen = pcaplib.Writer(open(<span class="string">'pkt_build_from_scapy.pcap'</span>, <span class="string">'wb'</span>))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    eth = Ether(src=<span class="string">'70:56:81:12:34:56'</span>, dst=<span class="string">'84:94:56:12:34:44'</span>)</span><br><span class="line"></span><br><span class="line">    ip = IP(src=<span class="string">'192.168.8.70'</span>, dst=<span class="string">'192.168.8.50'</span>)</span><br><span class="line"></span><br><span class="line">    tcp_rst = TCP(sport= <span class="number">5566</span>, dport=<span class="number">8080</span>, seq= <span class="number">1234566</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Combine</span></span><br><span class="line">    pkt = eth/ip/tcp_rst</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Write to pcap file</span></span><br><span class="line">    pcap_pen.write_pkt(pkt)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    build_pkt_scapy()</span><br></pre></td></tr></table></figure>
+<p>以上兩種方法皆可以做出封包，並且輕易的存成 PCAP file 讓你用 Wireshark 去檢查是不是有問題，所以好 Ryu 不用嗎? XD</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>最近在 Ryu 的 <a href="http://sourceforge.net/p/ryu/mailman/message/33611168/">mailing list</a> 上看到這個問題，就順便分享一下如何在 Ryu Controller 下製造一個客製化封包傳給 OpenFlow Switch (device)</p>
+<h3 id="應用情境">應用情境</h3><p>假設你在 Controller 收到某個封包之後又或是在某個條件下，需要先產生一個封包並且使用 OpenFlow 的 Packet-Out message 傳給 Switch</p>
+<p>這裏有兩種方法，分別是利用 Ryu 與 Scapy 皆可以產生客製化封包，以下提供你參考<br>]]>
+    
+    </summary>
+    
+      <category term="OpenFlow" scheme="http://linton.tw/tags/OpenFlow/"/>
+    
+      <category term="Ryu" scheme="http://linton.tw/tags/Ryu/"/>
+    
+      <category term="SDN" scheme="http://linton.tw/tags/SDN/"/>
+    
+      <category term="Scapy" scheme="http://linton.tw/tags/Scapy/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[An install script and guide for Ryu]]></title>
+    <link href="http://linton.tw/2015/02/18/2015-02-18-An-install-script-and-guide-for-Ryu/"/>
+    <id>http://linton.tw/2015/02/18/2015-02-18-An-install-script-and-guide-for-Ryu/</id>
+    <published>2015-02-17T16:58:05.000Z</published>
+    <updated>2015-04-26T18:00:46.000Z</updated>
+    <content type="html"><![CDATA[<p><img src="http://i.minus.com/iYGeioze8zEyS.png" alt="scripts"></p>
+<p>近期收到蠻多信（目前比較忙有些沒辦法一一回覆），大多都是研究生或專題生要做實驗，但是被安裝問題搞得很頭大，這通常都是相依套件的問題，其實問題不難解決。希望大家不要花太多時間在這。</p>
+<p>目前最新版的 Ryu 安裝上如果遇到問題，可以參考使用以下安裝腳本。</p>
+<p><a href="https://github.com/sdnds-tw/ryuInstallHelper" target="_blank" rel="external">https://github.com/sdnds-tw/ryuInstallHelper</a></p>
+<p>裡面有提供最完整的安裝教學指南。目前提供 <strong>Ubuntu</strong> 的安裝腳本，或是選用 <a href="https://virtualenv.pypa.io/en/latest/" target="_blank" rel="external">Virtualenv</a> 的方法。</p>
+<p>只要下面用兩行指令就可以把 Ryu 裝到好。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ wget https://raw.githubusercontent.com/sdnds-tw/ryuInstallHelper/master/ryuInstallHelper.sh&#10;$ bash ryuInstallHelper.sh</span><br></pre></td></tr></table></figure>
+<h4 id="Mac_OSX">Mac OSX</h4><p>另外想要在 <strong>Mac OSX</strong> 上做 SDN 實驗的也有提供安裝指南可以參考一下，在 <strong>Mac OSX</strong> 上建議使用 Virtualenv 的方式安裝。</p>
+<p>Ryu install guide on Mac OSX: <a href="https://github.com/sdnds-tw/ryuInstallHelper/tree/master/macosx" target="_blank" rel="external">https://github.com/sdnds-tw/ryuInstallHelper/tree/master/macosx</a></p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p><img src="http://i.minus.com/iYGeioze8zEyS.png" alt="scripts"></p>
+<p>近期收到蠻多信（目前比較忙有些沒辦法一一回覆），大多都是研究生或專題生要做實驗，但是被安裝問題搞得很頭大，這通常都是相依套件的問題，其]]>
+    </summary>
+    
+      <category term="OpenFlow" scheme="http://linton.tw/tags/OpenFlow/"/>
+    
+      <category term="Ryu" scheme="http://linton.tw/tags/Ryu/"/>
+    
+      <category term="SDN" scheme="http://linton.tw/tags/SDN/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[Saving captured packets in Ryu controller]]></title>
+    <link href="http://linton.tw/2015/01/26/2015-01-26-saving-captured-packets-in-ryu-controller/"/>
+    <id>http://linton.tw/2015/01/26/2015-01-26-saving-captured-packets-in-ryu-controller/</id>
+    <published>2015-01-26T08:15:14.000Z</published>
+    <updated>2015-02-03T16:13:24.000Z</updated>
+    <content type="html"><![CDATA[<p><img src="http://i2.minus.com/igLpHeXPT7LFt.png" alt="pcap"></p>
+<p>最近花了點時間研究 PCAP 的檔案格式，試著把 PCAP 的 Parser 用 Python 寫出來，本來就只是單純練習而躍躍欲試後結果。</p>
+<p>最終 lib 寫出來後就把這個 <a href="https://github.com/osrg/ryu/commit/3736b0c37d30d7f9be8e31a50258a852085f02cd" target="_blank" rel="external">patch</a> 送給 Ryu team 高興的是對方很快地就接受，並且跟我說這是個好東西。</p>
+<a id="more"></a>
+<h2 id="為什麼_patch_到_Ryu_Controller?">為什麼 patch 到 Ryu Controller?</h2><p>原因是後來想到有時候在 SDN Controller 上要開發 SDN Apps 因為某些原因需要把 Packet-In 的封包輸出來看，但是在 Controller 上直接把封包的內容直接輸出，顯示就只會看到一堆16進位的數值，還需要再透過各種方法把每種封包格式還原，實在是太傷神了。</p>
+<p>或許你可能會嘗試用 Wireshark 去抓封包來看，這是一個不錯的方法，但是我接下來想跟大家分享的是直接在 application 上直接呼叫 ryu.lib.pcaplib 來用可以更快的方法直接的把封包儲存下來看！</p>
+<h2 id="怎麼使用？">怎麼使用？</h2><ul>
+<li>把 pcaplib import 近來</li>
+<li>利用 <code>pcaplib.Writer()</code> 生一個物件，並餵入寫檔物件 <code>open(&#39;mypcap.pcap&#39;, &#39;wb&#39;)</code></li>
+<li>在有封包經過的 Handler 使用物件的 <code>write_pkt</code> method 並給予參數 <code>msg.data</code></li>
+</ul>
+<p>That’s it. 只需要上面三個步驟，就可以把封包存下來。唯一需要注意的是，通常會把它放在有封包經過的 Handler 可以參考以下的範例</p>
+<figure class="highlight python"><figcaption><span>pcapsave.py</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> ryu.lib <span class="keyword">import</span> pcaplib</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SimpleSwitch13</span><span class="params">(app_manager.RyuApp)</span>:</span></span><br><span class="line">    OFP_VERSIONS = [ofproto_v1_3.OFP_VERSION]</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, *args, **kwargs)</span>:</span></span><br><span class="line">        super(SimpleSwitch13, self).__init__(*args, **kwargs)</span><br><span class="line">        self.mac_to_port = &#123;&#125;</span><br><span class="line">        self.pcap_pen = pcaplib.Writer(open(<span class="string">'mypcap.pcap'</span>, <span class="string">'wb'</span>))</span><br><span class="line">        <span class="comment"># Creating an instance with a PCAP filename</span></span><br><span class="line">    <span class="decorator">@set_ev_cls(ofp_event.EventOFPPacketIn, MAIN_DISPATCHER)</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_packet_in_handler</span><span class="params">(self, ev)</span>:</span></span><br><span class="line">        msg = ev.msg</span><br><span class="line">        self.pcap_pen.write_pkt(msg.data)</span><br><span class="line">        <span class="comment"># Dump the data packet into PCAP file</span></span><br></pre></td></tr></table></figure>
+<p>另外還有提供讀取 PCAP 的 Class 如果需要的話可以參考以下的範例</p>
+<figure class="highlight python"><figcaption><span>pcapread.py</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> ryu.lib <span class="keyword">import</span> pcaplib</span><br><span class="line"><span class="keyword">from</span> ryu.lib.packet <span class="keyword">import</span> packet</span><br><span class="line"></span><br><span class="line">frame_count = <span class="number">0</span></span><br><span class="line"><span class="keyword">for</span> ts, buf <span class="keyword">in</span> pcaplib.Reader(open(<span class="string">'test.pcap'</span>, <span class="string">'rb'</span>)):</span><br><span class="line"><span class="comment"># Using the Reader iterator that yields packets in PCAP file</span></span><br><span class="line">		frame_count += <span class="number">1</span></span><br><span class="line">    pkt = packet.Packet(buf)</span><br><span class="line"></span><br><span class="line">    eth = pkt.get_protocols(ethernet.ethernet)[<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line">    dst = eth.dst</span><br><span class="line">    src = eth.src</span><br><span class="line"></span><br><span class="line">    <span class="keyword">print</span> frame_count, ts, dst, src, pkt</span><br><span class="line">    <span class="comment"># print frames count, timestamp, ethernet src, ethernet dst and raw packet.</span></span><br></pre></td></tr></table></figure>
+<p>Python 目前在第三方套件支援 PCAP 的 Parser 算是少的，只有一個還不錯用的 <a href="https://code.google.com/p/dpkt/" target="_blank" rel="external">dpkt</a> 函式庫，但是看上去好像沒在維護了？</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p><img src="http://i2.minus.com/igLpHeXPT7LFt.png" alt="pcap"></p>
+<p>最近花了點時間研究 PCAP 的檔案格式，試著把 PCAP 的 Parser 用 Python 寫出來，本來就只是單純練習而躍躍欲試後結果。</p>
+<p>最終 lib 寫出來後就把這個 <a href="https://github.com/osrg/ryu/commit/3736b0c37d30d7f9be8e31a50258a852085f02cd">patch</a> 送給 Ryu team 高興的是對方很快地就接受，並且跟我說這是個好東西。</p>]]>
+    
+    </summary>
+    
+      <category term="Python" scheme="http://linton.tw/tags/Python/"/>
+    
+      <category term="Ryu" scheme="http://linton.tw/tags/Ryu/"/>
+    
+      <category term="pcap" scheme="http://linton.tw/tags/pcap/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[Snort Rules Generator]]></title>
+    <link href="http://linton.tw/2014/12/27/2014-12-27-snort-rules-generator/"/>
+    <id>http://linton.tw/2014/12/27/2014-12-27-snort-rules-generator/</id>
+    <published>2014-12-27T15:44:14.000Z</published>
+    <updated>2014-12-30T01:48:36.000Z</updated>
+    <content type="html"><![CDATA[<h3 id="前言">前言</h3><p>好久沒有寫文章了，最近研究的主題是網路安全，在這方面做了一個專案。雖然原本期望是在兩年研究所時間都是投入在 SDN 的應用程式開發，但是人生總是會有一些意想不到的意外。</p>
+<a id="more"></a>
+<h3 id="Snort_Rules">Snort Rules</h3><p>Snort 是一款開源的入侵偵測系統 IDS 它的功能就不再花篇幅去贅述，主要精神在於深度封包檢查網路封包的特徵，利用的就是 Snort rules 去訂定這些特徵規則，達到 pattern maching 的功能。<br>一般通常如果沒有花錢去買 Snort rules 可以使用社群的 Rules 可以從 Snort 官方網站下載得到。</p>
+<p>我們可以針對某些特定的攻擊特徵去制定規則，寫下這些規則後丟給 Snort 他就會自動幫你做偵測。</p>
+<p>假設今天如果有非常多的 Malware 樣本如果要一一的側錄他的網路連線及行為寫下相關的規則，是不是有一個自動化的流程可以實作出來？</p>
+<h3 id="Snort_Rules_Generator">Snort Rules Generator</h3><p>這個 Idea 不是我提的，而是我們 LAB 以前學長做過的一個專案，其實已經有一段歷史，後來又輾轉交到我的手上，原本專案是用 C 實作，看起來完成度很高，經過我的幾次思考之後決定用 Python 重新實作。</p>
+<p>在這裡我分做兩個部分去實現：</p>
+<ul>
+<li><p>沙盒系統（分為三個步驟）</p>
+<ul>
+<li>建立沙盒與拍下快照</li>
+<li>活化病毒</li>
+<li>側錄封包</li>
+<li>返回快照的還原點</li>
+</ul>
+</li>
+<li><p>分析網路封包與產生 Snort Rules （分為四個步驟）</p>
+<ul>
+<li>解封包重組 Payload<ul>
+<li>抽取特徵</li>
+<li>判斷惡意或善意的連線</li>
+<li>如果是惡意連線產生 Snort Rules</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>由於使用 Python 的關係，廣泛的使用第三方套件，以下簡介一下所用的套件：</p>
+<p>沙盒系統原應該是使用類似 <a href="http://www.cuckoosandbox.org/" target="_blank" rel="external">Cuckoo sandbox</a> 這類的工具去做，但我目前只做到側錄封包還不需要到那麼複雜，就自己寫一套流程用的是 <a href="https://pypi.python.org/pypi/pyvbox" target="_blank" rel="external">Pyvbox</a></p>
+<p>分析網路封包與產生 Snort Rules 解封包重組 Payload 用 <a href="https://code.google.com/p/dpkt/" target="_blank" rel="external">Dpkt</a> 判斷惡意或善意連線需要有一個 Knowledge Base 依靠的是 <a href="https://www.virustotal.com/" target="_blank" rel="external">VirusTotal</a> 所提供的 API 這邊我有去申請 Private 的 API 每分鐘能發 300 個 requests 相較於 Public API 每分鐘 4 個 requests 是天差地遠！</p>
+<p>我想徵招興趣的朋友一起來做專案都在 Github 上！</p>
+<p><a href="https://github.com/John-Lin/malware" target="_blank" rel="external">https://github.com/John-Lin/malware</a></p>
+<p>對此專案有興趣，或想加入一起開發的朋友可以來信 <a href="&#x6d;&#x61;&#105;&#108;&#x74;&#x6f;&#58;&#x6c;&#x69;&#x6e;&#x74;&#x6f;&#110;&#x2e;&#116;&#119;&#64;&#103;&#x6d;&#x61;&#x69;&#x6c;&#x2e;&#99;&#111;&#109;">&#x6c;&#x69;&#x6e;&#x74;&#x6f;&#110;&#x2e;&#116;&#119;&#64;&#103;&#x6d;&#x61;&#x69;&#x6c;&#x2e;&#99;&#111;&#109;</a></p>
+<p>目前有幾項功能想要增加：</p>
+<ul>
+<li><p>產生非 HTTP Protocol 的規則 （沒錯！除 UDP 的規則目前尚在開發中， TCP 的 case 我目前只有針對 HTTP Protocol 產生的規則，因為 Windows 防火牆預設都把其他 port 關了，我就錄不到其他 port 的連線！）</p>
+</li>
+<li><p>優化產出的規則（這個部分牽涉層面比較廣泛，包括產出的規則能讓 Snort 有更佳的搜尋效率，或是一個更佳的 Snort rule parser ）</p>
+</li>
+<li><p>一個 Web 介面功能：提供上傳具有惡意網路流量之 PCAP 檔，並即時產出 Snort rules 的 Web 介面（目前最期待想做的一個部分！我已經用 Bottle.py 做了一個非常陽春的版本，等一下後面會附上連結與截圖）</p>
+</li>
+</ul>
+<p>目前已經分析過一萬多個惡意 PCAP 產生出 800 多個在 TCP 上的規則（UDP尚在開發）</p>
+<p>目前 Snort Rules Generator 網站在 <a href="http://snort.linton.tw:8080/" target="_blank" rel="external">http://snort.linton.tw:8080/</a><br>非常歡迎大家拿起你的 PCAP 來做測試 應該不會噴 500 才對 XDD<br>注意：因為 Host 在自家 OpenStack 的 VM 上面，隨時有斷線的可能 XD</p>
+<p>以下是上傳 PCAP 與產生 Snort rules 的截圖：</p>
+<p><img src="http://user-image.logdown.io/user/3997/blog/4047/post/247728/hKTRXHJ2Tdmx9nlL4cck_%E8%9E%A2%E5%B9%95%E6%88%AA%E5%9C%96%202014-12-28%2001.05.22.png" alt="螢幕截圖 2014-12-28 01.05.22.png"></p>
+<p><img src="http://user-image.logdown.io/user/3997/blog/4047/post/247728/a2FkV9lRouzjPfrcitY5_%E8%9E%A2%E5%B9%95%E6%88%AA%E5%9C%96%202014-12-28%2001.05.33.png" alt="螢幕截圖 2014-12-28 01.05.33.png"></p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<h3 id="前言">前言</h3><p>好久沒有寫文章了，最近研究的主題是網路安全，在這方面做了一個專案。雖然原本期望是在兩年研究所時間都是投入在 SDN 的應用程式開發，但是人生總是會有一些意想不到的意外。</p>]]>
+    
+    </summary>
+    
+      <category term="Malware" scheme="http://linton.tw/tags/Malware/"/>
+    
+      <category term="Python" scheme="http://linton.tw/tags/Python/"/>
+    
+      <category term="Sandbox" scheme="http://linton.tw/tags/Sandbox/"/>
+    
+      <category term="Snort" scheme="http://linton.tw/tags/Snort/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[Ryu with Snort Integration]]></title>
+    <link href="http://linton.tw/2014/09/03/2014-09-03-Ryu-with-Snort-Integration/"/>
+    <id>http://linton.tw/2014/09/03/2014-09-03-Ryu-with-Snort-Integration/</id>
+    <published>2014-09-02T17:03:34.000Z</published>
+    <updated>2014-12-30T01:39:15.000Z</updated>
+    <content type="html"><![CDATA[<p><img src="http://user-image.logdown.io/user/3997/blog/4047/post/221103/QPs7nl8iTnS45kvEo5jz_snort_ryu.png" alt="snort_ryu.png"></p>
+<p>最近在 Ryu contribute 一些 <a href="https://github.com/osrg/ryu/commit/bbb7724423d79532e10450e1a250fb46e5215416" target="_blank" rel="external">patch</a> 終於加進去官方的 Project 了！<br>特地寫這篇稍微介紹一下 Snort Integration，也順便分享一下在 Ryu 官方本身是不希望貢獻者使用 Pull Request 的情況下，到底要怎麼對 Ryu project 做出你的貢獻呢？</p>
+<a id="more"></a>
+<p>首先大概簡單帶過一下 Snort 到底在做什麼事情，然後再談怎麼拿他去跟 Ryu 做整合。我的部落格<a href="http://linton.tw/2014/08/17/Install-Snort-from-source-on-Ubuntu/">上一篇</a>就是記錄了 Snort 怎麼安裝，有興趣的可以參考。</p>
+<h3 id="About_Snort">About Snort</h3><hr>
+<p>Snort 是一套開放源碼的入侵偵測系統（Intrusion Detection System）又稱作 IDS 。它能夠即時地監測網路上的封包，並透過 Snort Rule 比對攻擊模式，當發現疑似有網路攻擊的行為發生時，會發出警告的訊息（Alert message）通知網路管理者，攻擊者的 5-Tuple 與攻擊的手法，等等…</p>
+<p>這其中的精神在 Snort Rule 它裡面描述著各種網路攻擊的形態，例如：DDoS, SQL injection 等等…<br>Snort 會在拆解封包的過程逐一比對 Snort Rule 一旦命中 Rule 就會發出警告。你可以花錢跟 Snort 官方購買他們的 Rule 或者是使用社群版免費的 Rule，或甚至你熟稔網路攻擊的形態你就可以自行撰寫 Rule 來定義你的規則。</p>
+<h3 id="Integrate_with_Ryu">Integrate with Ryu</h3><hr>
+<p>在介紹怎麼整合之前有個小插曲，其實這個整合早在2013年的3月就有看到他們在做，可是不知道為什麼後來變成沒有人在維護，甚至那份資料還消失了！所幸我在 NTT 來台灣開的一場<a href="http://linton.tw/2014/08/11/NTT-Network-Innovation-Laboratories-SDN-Seminar/"> SDN 研討會</a>上，問了他們的 project lead 這個問題，會後他說會寄給我那篇 Snort Integrate 資料。</p>
+<p>收到了這份資料之後，才發現他們沒再繼續做更新，為什麼需要更新呢？原因是 Ryu 曾經在某一版本的時候從使用 Gevent 換到 Eventlet （據他們表示，是因為 OpenStack 都是用 Eventlet 的框架去開發，為了跟 OpenStack 有比較高的整合度，所以才做出這個大改版）</p>
+<p>這個大改版讓這些舊的程式都沒法再使用，所以我就跳下去看 Eventlet 來改他舊的程式，好讓他可以支援目前的 Eventlet。這時候新的Snort Integration就誕生啦！</p>
+<p>回到正題，剛剛有提到 Snort 在發現遭受攻擊的時候，會提出警告訊息（Alert message）你可以選擇將這些訊息記錄在 log 檔、 console 上顯示或是把訊息輸出到 Unix Domain Socket 上（它是一個 client）。那我就參照之前就的那份 source code 去做，在 Ryu 上開一個 Unix Domain Socket的Server 這樣就能聽到 Snort 的警告訊息，最後在把它寫成一個 Event 讓它可以在 Application 上透過寫 event handler 的方式去把 alert message 的資訊顯示出來。</p>
+<p>那我們來看一下，在同一檯機器上的時候 Snort 跟 Ryu 的架構圖：</p>
+<p><img src="http://user-image.logdown.io/user/3997/blog/4047/post/221103/fm8tvM7ESQiNz8ivn4Kw_workflow01.png" alt="workflow01.png"></p>
+<p>最終是完成了，但是人總是貪心的，或許我們能在上面再多做一些 feature?</p>
+<p>就有人說啦，把 Snort 跟 Ryu 跑在同一檯機器上， Snort 需要拆解網路封包去判斷是否俱有惡意行為，那麼吃效能會影響 Controller 的。我就在思考要把 Snort 跟 Ryu 拆開的可行辦法，最後找出一個解決方案，在不需要動 Snort 的 source code 之下，我們讓 Snort 那檯機器多跑一隻程式可以接 Unix Domain Socket 的資料再把他往 Network Socket 打出去就能跟 Ryu 接上，所以我又在 Ryu 那邊加入了一個開啓 Network socket Server 這就是讓我們可以把 Snort 跟 Ryu 分開中間的橋樑。</p>
+<p>後來的改版，將 Snort 跟 Ryu 分開機器後的架構圖：</p>
+<p><img src="http://user-image.logdown.io/user/3997/blog/4047/post/221103/YEqEJWpTjavTmzT176AF_workflow02.png" alt="workflow02.png"></p>
+<p>以上這兩種模式，我都有實作進去 Ryu ，由應用程式開發者自己決定要選擇哪一個模式，只要記得把 Configure 設好就能選擇你要使用哪一種模式。</p>
+<p>詳細的文件資料可以參考：<a href="http://ryu.readthedocs.org/en/latest/snort_integrate.html" target="_blank" rel="external">Snort Integration</a> 或是 ryu source code 目錄底下的 <code>ryu/doc/snort_integrate.rst</code></p>
+<h3 id="Simple_switch_with_snort">Simple switch with snort</h3><hr>
+<p>為了怕大家不太熟悉怎麼樣用這個 lib 就在 sample app 裡面加入了一隻簡單的範例程式<code>simple_switch_snort.py</code> ，這個程式除了可以做 L2 Switch 還可以把封包 mirror 給 Snort 。當 Ryu 收到 Alert message 的時候就把 Alert message 顯示出來，當然包括攻擊者的 5-Tuple 有了這些資訊，我們就能在 Controller 那端 Block 掉惡意的來源！</p>
+<h3 id="About_Contribution">About Contribution</h3><hr>
+<p>會寫這段的原因是一開始也不懂得怎麼加 Patch 後來看到 <a href="http://osrg.github.io/ryu-book/en/html/" target="_blank" rel="external">Ryubook</a> 上的 [Contribution section] (<a href="http://osrg.github.io/ryu-book/en/html/contribute.html#sending-a-patch)有記錄，就稍微描述一下讓想要加" target="_blank" rel="external">http://osrg.github.io/ryu-book/en/html/contribute.html#sending-a-patch)有記錄，就稍微描述一下讓想要加</a> Patch 的朋友可以做一個參考。</p>
+<p>Ryu 雖然把 Source Code 放在 GitHub 但不太一樣的是他不能做 Pull Request 他希望所有開發者能夠遞交 Patch 到他們的 Mailing List 上，這種方式跟 Linux kernel 的開發方式一樣，遞交 patch 需要來一個你的Signed-off 然後他們如果 accept 的話，就能夠收錄進官方的 Ryu Project.</p>
+<p>我們可以使用 Git 來產生 Patch 然後對方接到這個 Patch 後，覺得滿意的話，他可以透過 <code>git am</code> 指令把 patch merge進去，可以參考以下步驟遞交 Patch：</p>
+<ul>
+<li><p>當你做完 source code 的變更後，我們通常會 Commit 寫一段你所做的變更的歷史記錄。</p>
+  <figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$ </span>git add sample.py</span><br><span class="line"><span class="variable">$ </span>git commit -m <span class="string">"Add sample application"</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>接下來利用 Git 產生 Patch, 別忘了 <code>-s</code> 是簽名哦！他會去 <code>.gitconfig</code> 拿你的名字跟 email 放在 patch 的後面</p>
+  <figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git <span class="keyword">format</span>-patch origin -<span class="literal">s</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>寄出你的 Patch 到 Mailing List 上。可以不加 <code>-to</code> 的選項 Git 會自動問你要寄給誰？ </p>
+  <figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git send-email <span class="number">0001</span>-sample<span class="class">.patch</span> -to ryu-devel@lists<span class="class">.sourceforge</span><span class="class">.net</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>靜待回音囉！通常還蠻快速的，這份 patch 會有你的簽名，未來如果有人有疑問或是發現 Bug 記得要修啊！</p>
+</li>
+</ul>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p><img src="http://user-image.logdown.io/user/3997/blog/4047/post/221103/QPs7nl8iTnS45kvEo5jz_snort_ryu.png" alt="snort_ryu.png"></p>
+<p>最近在 Ryu contribute 一些 <a href="https://github.com/osrg/ryu/commit/bbb7724423d79532e10450e1a250fb46e5215416">patch</a> 終於加進去官方的 Project 了！<br>特地寫這篇稍微介紹一下 Snort Integration，也順便分享一下在 Ryu 官方本身是不希望貢獻者使用 Pull Request 的情況下，到底要怎麼對 Ryu project 做出你的貢獻呢？</p>]]>
+    
+    </summary>
+    
+      <category term="OpenFlow" scheme="http://linton.tw/tags/OpenFlow/"/>
+    
+      <category term="Ryu" scheme="http://linton.tw/tags/Ryu/"/>
+    
+      <category term="Snort" scheme="http://linton.tw/tags/Snort/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[Install Snort from source on Ubuntu]]></title>
+    <link href="http://linton.tw/2014/08/17/2014-08-17-Install-Snort-from-source-on-Ubuntu/"/>
+    <id>http://linton.tw/2014/08/17/2014-08-17-Install-Snort-from-source-on-Ubuntu/</id>
+    <published>2014-08-16T16:30:45.000Z</published>
+    <updated>2014-12-30T01:39:15.000Z</updated>
+    <content type="html"><![CDATA[<p>Some installation notes about install snort from source code on Ubuntu 14.04</p>
+<p><img src="http://user-image.logdown.io/user/3997/blog/4047/post/220885/K33ZZzbfQw2fjtOtgljt_SnortTM.png" alt="SnortTM.png"></p>
+<a id="more"></a>
+<h3 id="Install_prerequrites_for_compiling_snort">Install prerequrites for compiling snort</h3><figure class="highlight q"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-<span class="built_in">get</span> <span class="keyword">update</span></span><br><span class="line">$ sudo apt-<span class="built_in">get</span> install flex bison build-essential checkinstall \ </span><br><span class="line">libpcap-<span class="built_in">dev</span> libnet1-<span class="built_in">dev</span> libpcre3-<span class="built_in">dev</span> libmysqlclient15-<span class="built_in">dev</span> \ </span><br><span class="line">libnetfilter-queue-<span class="built_in">dev</span> iptables-<span class="built_in">dev</span></span><br></pre></td></tr></table></figure>
+<hr>
+<h3 id="Download_DAQ,_Snort,_Libdnet_source_code">Download DAQ, Snort, Libdnet source code</h3><figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$ </span>wget <span class="symbol">https:</span>/<span class="regexp">/www.snort.org/downloads</span><span class="regexp">/snort/daq</span>-<span class="number">2.0</span>.<span class="number">2</span>.tar.gz</span><br><span class="line"><span class="variable">$ </span>wget <span class="symbol">https:</span>/<span class="regexp">/www.snort.org/downloads</span><span class="regexp">/snort/snort</span>-<span class="number">2.9</span>.<span class="number">6.2</span>.tar.gz</span><br><span class="line"><span class="variable">$ </span>wget <span class="symbol">http:</span>/<span class="regexp">/libdnet.googlecode.com/files</span><span class="regexp">/libdnet-1.12.tgz</span></span><br></pre></td></tr></table></figure>
+<hr>
+<h3 id="Unzip,_make_and_install_Libdnet">Unzip, make and install <a href="https://code.google.com/p/libdnet/" target="_blank" rel="external">Libdnet</a></h3><figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$ </span>tar zxvf libdnet-<span class="number">1.12</span>.tgz</span><br><span class="line"><span class="variable">$ </span>cd libdnet-<span class="number">1.12</span>/</span><br><span class="line"><span class="variable">$ </span>./configure; make</span><br><span class="line"><span class="variable">$ </span>sudo checkinstall</span><br><span class="line"><span class="variable">$ </span>sudo dpkg -i libdnet_1.<span class="number">12</span>-<span class="number">1_</span>amd64.deb</span><br><span class="line"><span class="variable">$ </span>sudo ln -s /usr/local/lib/libdnet.<span class="number">1.0</span>.<span class="number">1</span> /usr/lib/libdnet.<span class="number">1</span></span><br></pre></td></tr></table></figure>
+<p>When you type <code>sudo checkinstall</code> will encounter The following messages</p>
+<ul>
+<li><p>Should I Creat a default set of package docs? </p>
+<p>  Usually we used default, type y and Enter</p>
+</li>
+<li><p>You probably don’t want them to be included in the package. Do you want me to list them?  [n]: n</p>
+</li>
+<li><p>Should I exclude them from the package? (Saying yes is a good idea)  [n]: y</p>
+</li>
+</ul>
+<hr>
+<h3 id="Unzip,_make_and_install_DAQ">Unzip, make and install DAQ</h3><figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$ </span>tar xvfz daq-<span class="number">2.0</span>.<span class="number">2</span>.tar.gz</span><br><span class="line"><span class="variable">$ </span>cd daq-<span class="number">2.0</span>.<span class="number">2</span></span><br><span class="line"><span class="variable">$ </span>./configure <span class="string">"CFLAGS=-fPIC"</span>; make</span><br><span class="line"><span class="variable">$ </span>sudo checkinstall</span><br><span class="line"><span class="variable">$ </span>sudo dpkg -i daq_2.<span class="number">0</span>.<span class="number">2</span>-<span class="number">1_</span>amd64.deb</span><br></pre></td></tr></table></figure>
+<p>When you type <code>sudo checkinstall</code> will pop out the same meeeages again. Using the same solutions above.</p>
+<hr>
+<h3 id="Unzip,_make_and_install_Snort">Unzip, make and install Snort</h3><figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$ </span>tar xvfz snort-<span class="number">2.9</span>.<span class="number">6.2</span>.tar.gz</span><br><span class="line"><span class="variable">$ </span>cd snort-<span class="number">2.9</span>.<span class="number">6.2</span></span><br><span class="line"><span class="variable">$ </span>./configure --enable-sourcefire; make</span><br><span class="line"><span class="variable">$ </span>sudo checkinstall</span><br><span class="line"><span class="variable">$ </span>sudo dpkg -i snort_2.<span class="number">9.6</span>.<span class="number">2</span>-<span class="number">1_</span>amd64.deb</span><br><span class="line"><span class="variable">$ </span>sudo ln -s /usr/local/bin/snort /usr/sbin/snort</span><br><span class="line"><span class="variable">$ </span>sudo ldconfig -v</span><br></pre></td></tr></table></figure>
+<p>When you type <code>sudo checkinstall</code> will pop out the same meeeages again. Using the same solutions above.</p>
+<hr>
+<h3 id="Testing_Snort">Testing Snort</h3><figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$ </span>snort -<span class="constant">V</span></span><br></pre></td></tr></table></figure>
+<p><img src="http://user-image.logdown.io/user/3997/blog/4047/post/220885/5V4NHUdTAWXyDPR4O1Dq_%E8%9E%A2%E5%B9%95%E6%88%AA%E5%9C%96%202014-08-16%2018.55.37.png" alt="screenshot.png"></p>
+<hr>
+<h3 id="Some_trivial_settings">Some trivial settings</h3><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$ sudo groupadd snort</span><br><span class="line">$ sudo useradd snort -d <span class="regexp">/var/</span>log<span class="regexp">/snort -s /</span>sbin/nologin -c SNORT_IDS -g snort</span><br><span class="line"></span><br><span class="line">$ sudo mkdir <span class="regexp">/var/</span>log/snort</span><br><span class="line">$ sudo chown <span class="string">snort:</span>snort <span class="regexp">/var/</span>log/snort</span><br><span class="line"></span><br><span class="line">$ sudo mkdir <span class="regexp">/etc/</span>snort</span><br><span class="line">$ sudo tar zxvf snortrules-snapshot-<span class="number">2962.</span>tar.gz -C <span class="regexp">/etc/</span>snort/</span><br><span class="line">$ sudo touch <span class="regexp">/etc/</span>snort<span class="regexp">/rules/</span>white_list.rules <span class="regexp">/etc/</span>snort<span class="regexp">/rules/</span>black_list.rules</span><br><span class="line">$ sudo mkdir <span class="regexp">/usr/</span>local<span class="regexp">/lib/</span>snort_dynamicrules</span><br><span class="line"></span><br><span class="line">$ sudo chown -R <span class="string">snort:</span>snort <span class="regexp">/etc/</span>snort<span class="comment">/*</span><br><span class="line">$ sudo mv /etc/snort/etc<span class="comment">/* /etc/snort/</span></span></span><br></pre></td></tr></table></figure>
+<p><strong>For snortrules-snapshot-2962 snort rules, need to sign up and download the subscriber rules from <a href="https://www.snort.org/users/sign_in" target="_blank" rel="external">here</a></strong></p>
+<hr>
+<h3 id="Edit_the_snort_configuration_file">Edit the snort configuration file</h3><p>There are two parts of configuriton have to modify</p>
+<ul>
+<li>Internal and External Network address </li>
+</ul>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Setup the network addresses you are protecting</span></span><br><span class="line"><span class="comment"># ipvar HOME_NET any</span></span><br><span class="line"><span class="title">ipvar</span> HOME_NET <span class="number">192.168.8.0</span>/<span class="number">24</span></span><br><span class="line"><span class="comment"># Here you need to check your network configure by using ifconfig</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Set up the external network addresses. Leave as "any" in most situations</span></span><br><span class="line"><span class="comment"># ipvar EXTERNAL_NET any</span></span><br><span class="line">ipvar EXTERNAL_NET !<span class="variable">$HOME_NET</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>Path to your rules files</li>
+</ul>
+<figure class="highlight coffeescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Path to your rules files (this can be a relative path)</span></span><br><span class="line"><span class="comment"># Note for Windows users: You are advised to make this an absolute path,</span></span><br><span class="line"><span class="comment"># such as: c:\snort\rules</span></span><br><span class="line"><span class="reserved">var</span> RULE_PATH /etc/snort/rules</span><br><span class="line"><span class="reserved">var</span> SO_RULE_PATH /etc/snort/so_rules</span><br><span class="line"><span class="reserved">var</span> PREPROC_RULE_PATH /etc/snort/preproc_rules</span><br><span class="line"></span><br><span class="line"><span class="comment"># If you are using repution preprocessor set these</span></span><br><span class="line"><span class="reserved">var</span> WHITE_LIST_PATH /etc/snort/rules</span><br><span class="line"><span class="reserved">var</span> BLACK_LIST_PATH /etc/snort/rules</span><br></pre></td></tr></table></figure>
+<hr>
+<h3 id="Starts_Snort_in_self-test_mode">Starts Snort in self-test mode</h3><figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo snort -T -i eth0 -<span class="keyword">u</span> snort -<span class="keyword">g</span> snort -c /etc/snort/snort.<span class="keyword">conf</span></span><br></pre></td></tr></table></figure>
+<p>If there is a messagge said “Snort successfully validated the configuration! Snort exiting”, it’successful.</p>
+<p><img src="http://user-image.logdown.io/user/3997/blog/4047/post/220885/nnyVFfgiRFyuyO7wAgpp_%E8%9E%A2%E5%B9%95%E6%88%AA%E5%9C%96%202014-08-17%2000.37.45.png" alt="screenshot_self_test.png"></p>
+<hr>
+<h3 id="Troubleshoot">Troubleshoot</h3><ul>
+<li>snort: error while loading shared libraries: libsfbpf.so.0: cannot open shared object file: No such file or directory</li>
+</ul>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$ </span>sudo ldconfig</span><br></pre></td></tr></table></figure>
+<ul>
+<li>error-snort: error while loading shared libraries: libdnet.1: cannot open shared object file: No such file or directory</li>
+</ul>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo ln -s <span class="regexp">/usr/</span>local<span class="regexp">/lib/</span>libdnet.<span class="number">1.0</span>.<span class="number">1</span> <span class="regexp">/usr/</span>lib<span class="regexp">/libdnet.1</span></span><br></pre></td></tr></table></figure>
+<hr>
+<h3 id="Reference">Reference</h3><ul>
+<li><p><a href="https://www.youtube.com/watch?v=GVvS8Peb2fY" target="_blank" rel="external">Snort Install on Ubuntu 14.04LTS Part 1 on Youtube</a></p>
+</li>
+<li><p><a href="http://www.linuxquestions.org/questions/linux-newbie-8/snort-error-while-loading-shared-libraries-libdnet-1-cannot-open-shared-object-fil-901530/" target="_blank" rel="external">snort: error while loading shared libraries: libdnet.1: cannot open shared object fil</a></p>
+</li>
+<li><p><a href="http://seclists.org/snort/2010/q4/322" target="_blank" rel="external">Re: Snort 2.9 Setup Guide</a></p>
+</li>
+</ul>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>Some installation notes about install snort from source code on Ubuntu 14.04</p>
+<p><img src="http://user-image.logdown.io/user/3997/blog/4047/post/220885/K33ZZzbfQw2fjtOtgljt_SnortTM.png" alt="SnortTM.png"></p>]]>
+    
+    </summary>
+    
+      <category term="Snort" scheme="http://linton.tw/tags/Snort/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[NTT 未來網路研究所 SDN 研討會]]></title>
+    <link href="http://linton.tw/2014/08/11/2014-08-11-NTT-Network-Innovation-Laboratories-SDN-Seminar/"/>
+    <id>http://linton.tw/2014/08/11/2014-08-11-NTT-Network-Innovation-Laboratories-SDN-Seminar/</id>
+    <published>2014-08-10T17:29:02.000Z</published>
+    <updated>2014-12-30T01:39:15.000Z</updated>
+    <content type="html"><![CDATA[<p><a href="https://www.flickr.com/photos/linton-flickr/14691549400" title="NTT_SDN by 哲緯 林, on Flickr" target="_blank" rel="external"><img src="https://farm4.staticflickr.com/3879/14691549400_3c4081057c_z.jpg" width="640" height="478" alt="NTT_SDN"></a></p>
+<h3 id="前言">前言</h3><hr>
+<p>這次有幸參加 NTT 研究所 SDN 研討會，這場研討會是第一屆辦在台灣，直接聽 <a href="http://osrg.github.io/ryu/" target="_blank" rel="external">Ryu</a> 的主要開發者來介紹 Ryu 可以說是機會難得啊！總共有兩場一場在臺北的資策會，另一場則在新竹交大的浩然圖書館。議程的內容分為上午場的 Lagopus/Ryu 介紹 及下午場的 Lagopus/Ryu 研習操作。</p>
+<p>另外這次也聽到關於 <a href="http://Lagopus.github.io/" target="_blank" rel="external">Lagopus</a> 的介紹，這是一款專門為 OpenFlow 協定所造的 Virtual Switch 目前雖是 Alpha 版本，但對 OpenFlow 協定支援度是目前最高，更利用 <a href="http://dpdk.org/" target="_blank" rel="external">Intel DPDK</a> 技術做到快速處理封包的功能。</p>
+<a id="more"></a>
+<p>先來看一段官方的介紹：</p>
+<blockquote>
+<p>Intel® DPDK is a set of libraries and drivers for fast packet processing on x86 platforms. It runs mostly in Linux userland.</p>
+</blockquote>
+<h3 id="Ryu_介紹">Ryu 介紹</h3><hr>
+<p><a href="https://www.flickr.com/photos/linton-flickr/14875634784" title="LogoSet02 by 哲緯 林, on Flickr" target="_blank" rel="external"><img src="https://farm4.staticflickr.com/3851/14875634784_bea4b05ca8_n.jpg" width="320" height="249" alt="LogoSet02"></a></p>
+<p>這部分由 Ryu 的 Project lead FUJITA桑 來介紹（常在 Mailing List 上看到他），因為整個議程的時間並不長，並沒有很深入的去詳述一些程式的架構或流程，以及開發應用程式的細節，主要還是以一個較為較一般的介紹，但是我還是希望未來若還有機會能辦第二屆或許可以做更深入的討論。</p>
+<h4 id="OpenStack-Integration">OpenStack-Integration</h4><p>另外，我覺得這次的 Ryu 的演講都是專注在與 <a href="http://www.openstack.org/" target="_blank" rel="external">OpenStack</a> 的整合，包括 SDN 到底在 OpenStack 上扮演什麼樣的角色？以及他們團隊在開發與 OpenStack 上遇到什麼樣的挑戰，例如 Scalability 與 Availability 的問題，諸如此類。</p>
+<h4 id="Snort-Integration">Snort-Integration</h4><p>但是我其實更關注 Ryu 與 Snort 的整合，這部分其實早在2013的3月 Ryu 就有 Fork 出一個專案是關於 Snort-Integration 但是不知道為什麼後來就沒有更新，連帶的 GitHub 的專案網址就消失了，本次我也有問 FUJITA桑 關於這件事，他說請我聯絡他，他會寄給我專案資料包括 source code 最後我拿到但是這份 source code 我執行後發現他還是停在 Ryu 1.8 版本，已經落後目前的版本許久，且並不支援OpenFlow 1.3</p>
+<h3 id="Lagopus_介紹">Lagopus 介紹</h3><hr>
+<p><a href="https://www.flickr.com/photos/linton-flickr/14877910465" title="lagopus by 哲緯 林, on Flickr" target="_blank" rel="external"><img src="https://farm4.staticflickr.com/3891/14877910465_9707df8294_m.jpg" width="214" height="240" alt="lagopus"></a></p>
+<p>這個介紹是我最期待的一個部分，早在年初的時候就有聽到這個 Lagopus 專案的風聲，一款以軟體實作支援 OpenFlow 協定的虛擬交換器 (Virtual Switch) 其實就很像 <a href="http://openvswitch.org/" target="_blank" rel="external">Open vSwitch</a> 的專案在支持 OpenFlow 協定所做的事情。<br>Lagopus 其實是一隻叫做雷鳥的鳥類，他居住在海拔非常高的山上。開發者以一句話來形容他 <code>A bird in cloud</code> 我想這應該是要跟雲端接軌的一個 SDN 專案吧？</p>
+<h4 id="Intel_DPDK_(Data_Plane_Development_Kit)">Intel DPDK (Data Plane Development Kit)</h4><p>這款 Virtual Switch 最大的特色如前面所提的，它擁有 Intel DPDK 技術的支援，善用這個技術，可以做到快速處理封包的功能。看到這裡，大家心裡不免有些疑問？是不是需要有特定的硬體支援? 沒錯需要採用 Intel 的 CPU 跟 NIC (網路介面卡），但是在網卡部分也不全然需要 Intel 的。有興趣的朋友可以參考以下支援的硬體清單。</p>
+<ul>
+<li>Supported CPU: Intel Xeon E5, E3, Core i7, i5, i3, Atom </li>
+<li><a href="http://dpdk.org/doc/nics" target="_blank" rel="external">Supported NICs</a></li>
+</ul>
+<h4 id="Lagopus_inside_Switch">Lagopus inside Switch</h4><p>這次除了初步認識 Lagopus 之外，還有試著操作看看這套軟體，當然 NTT 這邊提供了已經裝好 Lagopus 支援 OpenFlow 的 Switch （這台是某一家公司提供的硬體上面已經裝好 Lagopus，未免廣告嫌疑XD 有興趣可以私信給我）目前據我所知僅可以裝在 CentOS 上，未來會支援 Debian/Ubuntu 我使用後發現了一些功能尚為較不完善的地方，例如: 加入或移除 flow entry 僅能以 controller 這邊去操控，不能直接透過 Switch 下指令進行操作，這部分在 OpenvSwitch 可以直接用指令做到。說了這麼多缺點也該來說一下優點，它是目前我看到以軟體實做的 switch 支援 OpenFlow 功能最完善的一款 Vswitch 此外它也是目前效能最高的一款 Vswitch 可以參考稍後的比較圖。</p>
+<p><a href="https://www.flickr.com/photos/linton-flickr/14855056846" title="Lagopus-Taiwan-20140805 by 哲緯 林, on Flickr" target="_blank" rel="external"><img src="https://farm6.staticflickr.com/5569/14855056846_f20d2b86b1_z.jpg" width="640" height="480" alt="Lagopus-Taiwan-20140805"></a></p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p><a href="https://www.flickr.com/photos/linton-flickr/14691549400" title="NTT_SDN by 哲緯 林, on Flickr"><img src="https://farm4.staticflickr.com/3879/14691549400_3c4081057c_z.jpg" width="640" height="478" alt="NTT_SDN"></a></p>
+<h3 id="前言">前言</h3><hr>
+<p>這次有幸參加 NTT 研究所 SDN 研討會，這場研討會是第一屆辦在台灣，直接聽 <a href="http://osrg.github.io/ryu/">Ryu</a> 的主要開發者來介紹 Ryu 可以說是機會難得啊！總共有兩場一場在臺北的資策會，另一場則在新竹交大的浩然圖書館。議程的內容分為上午場的 Lagopus/Ryu 介紹 及下午場的 Lagopus/Ryu 研習操作。</p>
+<p>另外這次也聽到關於 <a href="http://Lagopus.github.io/">Lagopus</a> 的介紹，這是一款專門為 OpenFlow 協定所造的 Virtual Switch 目前雖是 Alpha 版本，但對 OpenFlow 協定支援度是目前最高，更利用 <a href="http://dpdk.org/">Intel DPDK</a> 技術做到快速處理封包的功能。</p>]]>
+    
+    </summary>
+    
+      <category term="Lagopus" scheme="http://linton.tw/tags/Lagopus/"/>
+    
+      <category term="OpenFlow" scheme="http://linton.tw/tags/OpenFlow/"/>
+    
+      <category term="Ryu" scheme="http://linton.tw/tags/Ryu/"/>
+    
+      <category term="SDN" scheme="http://linton.tw/tags/SDN/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[My first time using hexo]]></title>
+    <link href="http://linton.tw/2014/08/08/2014-08-08-My-first-time-using-hexo/"/>
+    <id>http://linton.tw/2014/08/08/2014-08-08-My-first-time-using-hexo/</id>
+    <published>2014-08-08T08:40:27.000Z</published>
+    <updated>2014-12-30T01:39:15.000Z</updated>
+    <content type="html"><![CDATA[<p>Hello there, this is my first time using hexo to build my blog!</p>
+<a id="more"></a>
+<p>中文測試。。。</p>
+<p>前出師表</p>
+<p>臣亮言：先帝創業未半，而中道崩殂；今天下三分，益州疲敝，此誠危急存亡之秋也。然侍衛之臣，不懈於內；忠志之士，忘身於外者：蓋追先帝之殊遇，欲報之于陛下也。誠宜開張聖聽，以光先帝遺德，恢弘志士之氣；不宜妄自菲薄，引喻失義，以塞忠諫之路也。宮中府中，俱為一體；陟罰臧否，不宜異同：若有作奸犯科，及為忠善者，宜付有司，論其刑賞，以昭陛下平明之治；不宜偏私，使內外異法也。侍中、侍郎郭攸之、費依、董允等，此皆良實，志慮忠純，是以先帝簡拔以遺陛下：愚以為宮中之事，事無大小，悉以咨之，然後施行，必得裨補闕漏，有所廣益。將軍向寵，性行淑均，曉暢軍事，試用之於昔日，先帝稱之曰“能”，是以泷議舉寵?督：愚以為營中之事，事無大小，悉以咨之，必能使行陣和穆，優劣得所也。親賢臣，遠小人，此先漢所以興隆也；親小人，遠賢臣，此後漢所以傾頹也。先帝在時，每與臣論此事，未嘗不歎息痛恨於桓、靈也！侍中、尚書、長史、參軍，此悉貞亮死節之臣也，願陛下親之、信之，則漢室之隆，可計日而待也。臣本布衣，躬耕南陽，苟全性命於亂世，不求聞達于諸侯。先帝不以臣卑鄙，猥自枉屈，三顧臣於草廬之中，諮臣以當世之事，由是感激，遂許先帝以驅馳。後值傾覆，受任於敗軍之際，奉命於危難之間：爾來二十有一年矣。先帝知臣謹慎，故臨崩寄臣以大事也。受命以來，夙夜憂慮，恐付託不效，以傷先帝之明；故五月渡瀘，深入不毛。今南方已定，甲兵已足，當獎帥三軍，北定中原，庶竭駑鈍，攘除奸凶，興複漢室，還於舊都：此臣所以報先帝而忠陛下之職分也。至於斟酌損益，進盡忠言，則攸之、依、允等之任也。願陛下托臣以討賊興複之效，不效則治臣之罪，以告先帝之靈；若無興複之言，則責攸之、依、允等之咎，以彰其慢。陛下亦宜自謀，以諮諏善道，察納雅言，深追先帝遺詔。臣不勝受恩感激！今當遠離，臨表涕泣，不知所云。</p>
+<p><a href="https://www.google.com/" target="_blank" rel="external">Google</a></p>
+<p>Python code highlighting testing</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">import this&#10;&#10;class foo():&#10;    def __init__(self, data):&#10;        self.data = data&#10;    &#10;    def do_nothing(self):&#10;        pass&#10;&#10;f = foo(13)&#10;f.do_nothing()&#10;&#10;print &#34;Hello, this is code highlighting testing!&#34;</span><br></pre></td></tr></table></figure>
+<p>簡易好用、輕量又快速的hexo 完美的node.js專案！</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>Hello there, this is my first time using hexo to build my blog!</p>]]>
+    
+    </summary>
+    
+      <category term="Hexo" scheme="http://linton.tw/tags/Hexo/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[在 Mac OS X Mavericks 上安裝 Aten UC-232A USB to Serial 驅動程式]]></title>
+    <link href="http://linton.tw/2014/07/28/2014-07-28-in-the-mac-os-x-install-aten-mavericks-uc-232a-usb-to-serial-driver/"/>
+    <id>http://linton.tw/2014/07/28/2014-07-28-in-the-mac-os-x-install-aten-mavericks-uc-232a-usb-to-serial-driver/</id>
+    <published>2014-07-28T09:11:00.000Z</published>
+    <updated>2014-12-30T01:39:15.000Z</updated>
+    <content type="html"><![CDATA[<h3 id="前言">前言</h3><hr>
+<p>今天在摸索 Centec v350 時候，想要在 Mac 上利用 <strong>screen</strong> 應用程式，連線 Serial Port 發現一件小問題。</p>
+<p>原本在 Mac 上使用 RS-232 轉 Serial 的裝置應該是一件很輕鬆的的事情，找到本文的主角【Aten UC-232A】對應的驅動程式（<a href="http://www.prolific.com.tw/US/ShowProduct.aspx?p_id=229&amp;pcid=41" target="_blank" rel="external">官方下載點</a>）利用 <strong>screen</strong> 程式指定控制終端設備<code>/dev/tty.usbserial</code> 與 <code>Baud rate</code> 就能利用 COM port 輕鬆連入 Switch 但是，事情似乎不是你我想的那麼簡單…</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ screen /dev/tty<span class="class">.usbserial</span> <span class="number">128000</span></span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<p>你會發現，當你裝好驅動程式之後，進去 /dev 卻發現找不到 tty.usbserial 檔案，這樣一來就沒辦法用了…</p>
+<h3 id="發現問題">發現問題</h3><hr>
+<p>原來是 Prolific 官方的 Driver 似乎不斷的更新，而 Aten UC-232A 就是使用 Prolific 的晶片，神奇的是 Vendor ID 和 Product ID 卻不在 Prolific 的 Driver 裡面（猜測是軟體更新太快，硬體太舊變成孤兒了），這會讓你沒辦法正常使用，即使你裝好了 Driver 接上 Aten UC-232A 的 USB to Serial 裝置</p>
+<h3 id="解決方法">解決方法</h3><hr>
+<h4 id="檢查裝置的資訊">檢查裝置的資訊</h4><p><img src="http://user-image.logdown.io/user/3997/blog/4047/post/211786/IXZiuqHQB6NeUs5Jb5Xy_%E8%9E%A2%E5%B9%95%E6%88%AA%E5%9C%96%202014-07-29%2011.11.16.png" alt="螢幕截圖 2014-07-29 11.11.16.png"></p>
+<p>接上 UC-232A 後， 打開 Mac 裡的【系統資訊】並檢查裝置的 Vendor ID 和 Product ID 在我的裝置底下看到的是</p>
+<p>(Product ID: 0x2008 and Vendor ID: 0x0557)</p>
+<p>請注意，我們需要把這個換成從 <strong>十六進位</strong> 的數值換成 <strong>十進位</strong> 的並且記下來</p>
+<p>(Product ID: 8200 and Vendor ID: 1367)</p>
+<h4 id="下載安裝驅動程式">下載安裝驅動程式</h4><p>從 <a href="http://www.prolific.com.tw/US/ShowProduct.aspx?p_id=229&amp;pcid=41" target="_blank" rel="external">Prolific 的官方下載點</a> 下載檔案名稱 md_PL2303_MacOSX_10_6up_v1_5_1.zip 解壓縮之後會出現 PL2303_MacOSX_v1.5.1.pkg 安裝後，需要重新啟動電腦。</p>
+<h4 id="修正_UC-232A_Driver_的_plist_檔案">修正 UC-232A Driver 的 plist 檔案</h4><p>修改一下 plist 檔案需要管理者權限</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo vim <span class="regexp">/System/</span>Library<span class="regexp">/Extensions/</span>ProlificUsbSerial.kext<span class="regexp">/Contents/I</span>nfo.plist</span><br></pre></td></tr></table></figure>
+<p>可以利用搜尋找到 <code>&lt;key&gt;IOKitPersonalities&lt;/key&gt;</code> 這行下面大概會是像以下這樣</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">key</span>&gt;</span>067B_2303<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">dict</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>CFBundleIdentifier<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">string</span>&gt;</span>com.prolific.driver.PL2303<span class="tag">&lt;/<span class="title">string</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>IOClass<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">string</span>&gt;</span>com_prolific_driver_PL2303<span class="tag">&lt;/<span class="title">string</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>IOProviderClass<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">string</span>&gt;</span>IOUSBInterface<span class="tag">&lt;/<span class="title">string</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>bConfigurationValue<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">integer</span>&gt;</span>1<span class="tag">&lt;/<span class="title">integer</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>bInterfaceNumber<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">integer</span>&gt;</span>0<span class="tag">&lt;/<span class="title">integer</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>idProduct<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">integer</span>&gt;</span>8963<span class="tag">&lt;/<span class="title">integer</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>idVendor<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">integer</span>&gt;</span>1659<span class="tag">&lt;/<span class="title">integer</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">dict</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>姑且先稱上面的裝置設定檔叫做 <strong>一個區塊</strong> 吧！你大概可以看到包含我剛剛上面所貼的總共有 <strong>兩個區塊</strong>，</p>
+<p>我們需要複製 <strong>其中一個區塊</strong> 作為參考的範例，並且把剛剛第一步所看到的 <strong>Vendor ID</strong> 和 <strong>Product ID</strong> 修改複製後的範例，後貼在第二個區塊的後面，實際做法只需要更改三個地方就是 <strong>idProduct</strong> 和 <strong>idVendor</strong> 把剛剛記下來的 <strong>Vendor ID</strong> 和 <strong>Product ID</strong> 的十進位值填入，另外就是 \<key> 標簽裡面用 0557_2008 替代</key></p>
+<p>完成後大概如下面的樣子，你會擁有三個區塊</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">key</span>&gt;</span>067B_2303<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">dict</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>CFBundleIdentifier<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">string</span>&gt;</span>com.prolific.driver.PL2303<span class="tag">&lt;/<span class="title">string</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>IOClass<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">string</span>&gt;</span>com_prolific_driver_PL2303<span class="tag">&lt;/<span class="title">string</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>IOProviderClass<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">string</span>&gt;</span>IOUSBInterface<span class="tag">&lt;/<span class="title">string</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>bConfigurationValue<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">integer</span>&gt;</span>1<span class="tag">&lt;/<span class="title">integer</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>bInterfaceNumber<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">integer</span>&gt;</span>0<span class="tag">&lt;/<span class="title">integer</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>idProduct<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">integer</span>&gt;</span>8963<span class="tag">&lt;/<span class="title">integer</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>idVendor<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">integer</span>&gt;</span>1659<span class="tag">&lt;/<span class="title">integer</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">dict</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">key</span>&gt;</span>067B_2304<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">dict</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>CFBundleIdentifier<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">string</span>&gt;</span>com.prolific.driver.PL2303<span class="tag">&lt;/<span class="title">string</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>IOClass<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">string</span>&gt;</span>com_prolific_driver_PL2303<span class="tag">&lt;/<span class="title">string</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>IOProviderClass<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">string</span>&gt;</span>IOUSBInterface<span class="tag">&lt;/<span class="title">string</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>bConfigurationValue<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">integer</span>&gt;</span>1<span class="tag">&lt;/<span class="title">integer</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>bInterfaceNumber<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">integer</span>&gt;</span>0<span class="tag">&lt;/<span class="title">integer</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>idProduct<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">integer</span>&gt;</span>8964<span class="tag">&lt;/<span class="title">integer</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>idVendor<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">integer</span>&gt;</span>1659<span class="tag">&lt;/<span class="title">integer</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">dict</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">key</span>&gt;</span>0557_2008<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">dict</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>CFBundleIdentifier<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">string</span>&gt;</span>com.prolific.driver.PL2303<span class="tag">&lt;/<span class="title">string</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>IOClass<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">string</span>&gt;</span>com_prolific_driver_PL2303<span class="tag">&lt;/<span class="title">string</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>IOProviderClass<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">string</span>&gt;</span>IOUSBInterface<span class="tag">&lt;/<span class="title">string</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>bConfigurationValue<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">integer</span>&gt;</span>1<span class="tag">&lt;/<span class="title">integer</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>bInterfaceNumber<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">integer</span>&gt;</span>0<span class="tag">&lt;/<span class="title">integer</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>idProduct<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">integer</span>&gt;</span>8200<span class="tag">&lt;/<span class="title">integer</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>idVendor<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">integer</span>&gt;</span>1367<span class="tag">&lt;/<span class="title">integer</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;/<span class="title">dict</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h4 id="測試_Driver">測試 Driver</h4><p>執行下面的指令，你應該不會得到錯誤訊息。一旦成功後，你應該可以看到並且可以使用 <code>/dev/tty.usbserial</code></p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo kextload <span class="regexp">/System/</span>Library<span class="regexp">/Extensions/</span>ProlificUsbSerial.kext</span><br></pre></td></tr></table></figure>
+<h4 id="測試_Driver_的自動載入">測試 Driver 的自動載入</h4><p>重啟系統，接上 UC-232A 應該會自動載入，如果沒有順利的自動載入可以執行以下指令</p>
+<figure class="highlight delphi"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo touch /System/<span class="keyword">Library</span>/Extensions</span><br></pre></td></tr></table></figure>
+<p>再回到上一個步驟，【測試 Driver】試試應該可以成功。</p>
+<h4 id="參考資料">參考資料</h4><ul>
+<li><a href="http://blog.unfed.org/2013/10/using-aten-uc-232a-usb-to-serial.html" target="_blank" rel="external">Using Aten UC-232A USB to Serial converter on Mac OS X Mavericks</a></li>
+</ul>
+]]></content>
+    <summary type="html">
+    <![CDATA[<h3 id="前言">前言</h3><hr>
+<p>今天在摸索 Centec v350 時候，想要在 Mac 上利用 <strong>screen</strong> 應用程式，連線 Serial Port 發現一件小問題。</p>
+<p>原本在 Mac 上使用 RS-232 轉 Serial 的裝置應該是一件很輕鬆的的事情，找到本文的主角【Aten UC-232A】對應的驅動程式（<a href="http://www.prolific.com.tw/US/ShowProduct.aspx?p_id=229&amp;pcid=41">官方下載點</a>）利用 <strong>screen</strong> 程式指定控制終端設備<code>/dev/tty.usbserial</code> 與 <code>Baud rate</code> 就能利用 COM port 輕鬆連入 Switch 但是，事情似乎不是你我想的那麼簡單…</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ screen /dev/tty<span class="class">.usbserial</span> <span class="number">128000</span></span><br></pre></td></tr></table></figure>]]>
+    
+    </summary>
+    
+      <category term="Aten UC-232A" scheme="http://linton.tw/tags/Aten-UC-232A/"/>
+    
+      <category term="Mac OS X Mavericks" scheme="http://linton.tw/tags/Mac-OS-X-Mavericks/"/>
+    
+      <category term="USB to Serial" scheme="http://linton.tw/tags/USB-to-Serial/"/>
+    
+      <category term="driver" scheme="http://linton.tw/tags/driver/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[ 2014年京台大學生IT交流營【北京郵電大學】]]></title>
+    <link href="http://linton.tw/2014/07/06/2014-07-06-beijing-college-student-it-camp-university-of-posts-and-telecommunications/"/>
+    <id>http://linton.tw/2014/07/06/2014-07-06-beijing-college-student-it-camp-university-of-posts-and-telecommunications/</id>
+    <published>2014-07-06T05:43:00.000Z</published>
+    <updated>2014-12-30T01:39:15.000Z</updated>
+    <content type="html"><![CDATA[<iframe src="https://www.flickr.com/photos/linton-flickr/14549875502/player/685f169332" height="534" width="800" frameborder="0" allowfullscreen webkitallowfullscreen="" mozallowfullscreen="" oallowfullscreen="" msallowfullscreen=""></iframe>
+
+<p>結束北京郵電大學BUPT的IT交流營，對於未來的就業與求學目標似乎又有更進一步的體悟。當初想參加的原因單純是因為在中國的SDN網路社群認識一位就讀於北郵的同學 - 李呈，是我在社群裡看到的少數非常優秀的大四學生，想借此機會好好地與他聊聊SDN，但同是畢業生的他，因為已經畢業必須要退宿，所以我們只有在北郵校園見到一面，不免覺得可惜。此外因為北郵在通信領域十分出色，號稱【信息通信的黃埔軍校】的學校，在大學四年主修通訊工程的我，當然希望能夠更進一步的接觸到北郵的學生與他們交流。</p>
+<a id="more"></a>
+<p>北京夏天天氣十分的炎熱，前陣子還出現高溫達41度的氣溫，空氣品質極度惡劣，霾害幾乎天天都發生，大大降低能見度，可以這麼說在這裡你想看到藍天與白雲，抱歉那是一種奢侈。認識這邊的學生後，我敢說台灣的大學所提供的就學環境、住宿品質都比他們好上太多太多，在高溫的夏天裡光是住宿六人一房、全部都【沒有提供】冷氣、電扇，這個在台灣的大學是很難發生的，更不用說台灣還可以選擇外宿住在校外，中國的學生必須要遵守學校的規定一定住學校所提供的宿舍。我就曾參觀過裡面宿舍裡面的環境，我相信台灣的學生一定沒辦法接受這樣的環境待上四年，但是他們為了學習，還是必須要在這艱困的環境中競爭。</p>
+<p>2014/07/01 林哲緯</p>
+<p><iframe src="https://www.flickr.com/photos/linton-flickr/14365256890/player/ed020bcf5d" height="534" width="800" frameborder="0" allowfullscreen webkitallowfullscreen="" mozallowfullscreen="" oallowfullscreen="" msallowfullscreen=""></iframe><br>上圖為參訪華為公司時的團體照</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<iframe src="https://www.flickr.com/photos/linton-flickr/14549875502/player/685f169332" height="534" width="800"  frameborder="0" allowfullscreen webkitallowfullscreen mozallowfullscreen oallowfullscreen msallowfullscreen></iframe>
+
+<p>結束北京郵電大學BUPT的IT交流營，對於未來的就業與求學目標似乎又有更進一步的體悟。當初想參加的原因單純是因為在中國的SDN網路社群認識一位就讀於北郵的同學 - 李呈，是我在社群裡看到的少數非常優秀的大四學生，想借此機會好好地與他聊聊SDN，但同是畢業生的他，因為已經畢業必須要退宿，所以我們只有在北郵校園見到一面，不免覺得可惜。此外因為北郵在通信領域十分出色，號稱【信息通信的黃埔軍校】的學校，在大學四年主修通訊工程的我，當然希望能夠更進一步的接觸到北郵的學生與他們交流。</p>]]>
+    
+    </summary>
+    
+      <category term="BUPT" scheme="http://linton.tw/tags/BUPT/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[【心得】如何開發 SDN / OpenFlow 應用程式]]></title>
+    <link href="http://linton.tw/2014/05/15/2014-05-15-learned-how-to-develop-sdn-openflow-applications/"/>
+    <id>http://linton.tw/2014/05/15/2014-05-15-learned-how-to-develop-sdn-openflow-applications/</id>
+    <published>2014-05-15T08:20:00.000Z</published>
+    <updated>2014-12-30T01:39:15.000Z</updated>
+    <content type="html"><![CDATA[<p><img src="http://user-image.logdown.io/user/3997/blog/4047/post/199222/JqRt3wgTPqHwdeq8zizA_newlogo7.png" alt="newlogo7.png"></p>
+<h3 id="前言">前言</h3><hr>
+<p>最近用 Ryu Framework 開發 SDN 的 Network address translation (NAT) 已經告一個段落（非常感謝在資策會兩位強大同事能夠請教、學習）。目前已經由另外一位夥伴，接力去開發 Multi-WAN port 的功能，期望最終目標能做到 Load Balance 的效果。</p>
+<a id="more"></a>
+<p>在利用 OpenFlow 開發 SDN 應用程式的同時，對處理網路封包有更深一層的認識，如何用軟體（Software）去定義（Define）網路（Network）是一件非常有趣的事情。<br>Controller 在 SDN 網路裏幾乎扮演著上帝的角色，由開發者去決定網路封包的流向，甚至能做到修改封包的 Source IP, Destination IP, Source port, Destination port, 偽造並發出 IP, ARP 封包等等… </p>
+<h3 id="開發_SDN_/_OpenFlow_的環境介紹">開發 SDN / OpenFlow 的環境介紹</h3><hr>
+<p>目前開發的環境是利用 OpenFlow switch 加上一台 Controller 與若干台 Host PC：</p>
+<ul>
+<li><p>Controller：僅開發用途，一般的電腦或筆電即可，作業系統建議採用 Linux / Mac OS</p>
+</li>
+<li><p>OpenFlow Switch 這邊有幾個解決方案，依照建議順序分別為：</p>
+<ul>
+<li><p><strong>Openflow supported switches</strong>：花費比較高的方法，需要買一台支援 Openflow 的 Switch 價格不便宜，可以參考 <a href="http://osrg.github.io/ryu/certification.html" target="_blank" rel="external">Ryu 官方認證的 switch</a></p>
+</li>
+<li><p><strong><a href="http://openvswitch.org/" target="_blank" rel="external">Open vSwitch</a></strong>：需要了解一些 Network Bridge 的技術，編譯 Open vSwitch 的 source code 並將 kernel modules 植入 Linux kernel. 建置OVS環境可以參考這篇 - <a href="http://neokentblog.blogspot.tw/2013/10/linuxopenflow-switchopenvswitch.html" target="_blank" rel="external">如何將Linux打造成OpenFlow Switch：Openvswitch</a></p>
+</li>
+<li><p><strong><a href="http://mininet.org/" target="_blank" rel="external">Mininet</a></strong>：目前最簡易的方法就能模擬出 OpenFlow Switch 並客制化網路拓樸。</p>
+</li>
+</ul>
+</li>
+<li><p>Host：一般的電腦即可，安裝什麼作業系統不會有影響，建議安裝 <a href="http://www.wireshark.org/" target="_blank" rel="external">Wireshark</a> 方便 Debug</p>
+</li>
+</ul>
+<h3 id="OpenFlow_Switch_的選擇">OpenFlow Switch 的選擇</h3><hr>
+<p>如果在學校實驗室有經費，當然首推使用 Openflow supported switches 不過要注意的是 OpenFlow Protocol 協定雖然目前都號稱支援到 1.3 但是有些功能其實根本沒有支援（應該是沒有 OpenFlow supported 的晶片），像是 Spec. 中目前還是 Option 的 Actions Set-field.</p>
+<p>值得注意的是使用 Open vSwitch 的環境比較特別，若想實體化，需要有一個嵌入式的開發平台，並且有2個以上乙太網路孔一個 Controller Plane 其他為 Data Plane 的目前我們是用 <a href="http://pandaboard.org/" target="_blank" rel="external">Pandaboard</a> 上面有 Arch Linux 並植入 Open vSwitch 的 kernel modules.</p>
+<p>最近我也同時在研究如何將 Open vSwitch v2.1 放到 OpenWRT 透過 Cross compile 編出 TL-1043ND v1.1的韌體，目前已經成功編譯出支援 OpenFlow Protocol 1.3 的 Binary (有需要 Binary 自己嘗試的，可以寄 Email 給我)，但是 network config 有一些小問題尚未解決，或許有機會可以再來寫一篇如何編譯即設定 OVS 環境。</p>
+<p>三個方法我比較少用的是 Mininet 因為想要做出真實的網路，而不是模擬網路拓蹼環境，不過未來不會排斥使用 mininet。</p>
+<h3 id="OpenFlow_Controller_Framework_的選擇">OpenFlow Controller Framework 的選擇</h3><hr>
+<p>因為軟體定義網路的關係，目前 Open Source 的 Controller 可以說是百家爭鳴，但是支援 OpenFlow Protocol 1.3 以上的 Controller 目前還不算多。</p>
+<p>目前較受歡迎的 Controller 如下</p>
+<ul>
+<li><p><a href="http://osrg.github.io/ryu/" target="_blank" rel="external">Ryu</a>：開發利用 Python，官方宣稱支援到 OpenFlow Protocol 1.4 為日本 NTT 主導開發。</p>
+</li>
+<li><p><a href="http://www.opendaylight.org/" target="_blank" rel="external">Open Daylight</a>：開發利用 Java 支援到 OpenFlow Protocol 1.3 是目前最強大的陣容，彙集各大網路設備商包含 Cisco, Juniper, HP, IBM</p>
+</li>
+<li><p><a href="http://www.projectfloodlight.org/floodlight/" target="_blank" rel="external">Floodlight</a>：開發利用 Java 目前僅支援到 OpenFlow Protocol 1.0 </p>
+</li>
+<li><p><a href="http://www.noxrepo.org/nox/about-nox/" target="_blank" rel="external">NOX</a>：算是第一款出現的 OpenFlow controller 開發利用 C++ 僅支援到 OpenFlow Protocol 1.0 目前看似已經沒有再繼續開發，名稱改為 NOX-Classic，開發者似乎把精力都投往 POX 上做開發。</p>
+</li>
+<li><p><a href="http://www.noxrepo.org/pox/about-pox/" target="_blank" rel="external">POX</a>：開發利用 Python 僅支援到 OpenFlow Protocol 1.1 </p>
+</li>
+</ul>
+<p>目前我使用 Ryu 作為開發框架，會選 Ryu 主要原因是本身對 Python 的熟悉程度較高，次要的原因就是 OpenFlow Protocol 支援的程度較快。當然 Python 因為其語言特性，本身寫起來十分的簡潔易懂，所以相較于其他語言的 OpenFlow Controller 框架，Ryu 開發速度較為快些。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p><img src="http://user-image.logdown.io/user/3997/blog/4047/post/199222/JqRt3wgTPqHwdeq8zizA_newlogo7.png" alt="newlogo7.png"></p>
+<h3 id="前言">前言</h3><hr>
+<p>最近用 Ryu Framework 開發 SDN 的 Network address translation (NAT) 已經告一個段落（非常感謝在資策會兩位強大同事能夠請教、學習）。目前已經由另外一位夥伴，接力去開發 Multi-WAN port 的功能，期望最終目標能做到 Load Balance 的效果。</p>]]>
+    
+    </summary>
+    
+      <category term="Controller" scheme="http://linton.tw/tags/Controller/"/>
+    
+      <category term="OpenFlow" scheme="http://linton.tw/tags/OpenFlow/"/>
+    
+      <category term="Python" scheme="http://linton.tw/tags/Python/"/>
+    
+      <category term="Ryu" scheme="http://linton.tw/tags/Ryu/"/>
+    
+      <category term="SDN" scheme="http://linton.tw/tags/SDN/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[OpenFlow 1.3 for OpenWRT on TL-1043ND with OVS]]></title>
+    <link href="http://linton.tw/2014/05/13/2014-05-13-openflow-13-for-openwrt-on-tl-1043nd-with-open-vswitch/"/>
+    <id>http://linton.tw/2014/05/13/2014-05-13-openflow-13-for-openwrt-on-tl-1043nd-with-open-vswitch/</id>
+    <published>2014-05-13T08:12:00.000Z</published>
+    <updated>2014-12-30T01:39:15.000Z</updated>
+    <content type="html"><![CDATA[<h3 id="前言">前言</h3><hr>
+<p>本篇記錄如何編譯OpenWrt 和把 OpenvSwitch 植入在 TL-1043ND 上</p>
+<a id="more"></a>
+<h3 id="環境">環境</h3><hr>
+<p>Linux Mint 16 64-bit</p>
+<h3 id="Cross-Compiling">Cross-Compiling</h3><hr>
+<ol>
+<li><p>相關套件</p>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-<span class="preprocessor">get</span> install <span class="keyword">build-essential </span><span class="keyword">binutils </span>flex \</span><br><span class="line"><span class="keyword">bison </span>autoconf gettext texinfo sharutils <span class="keyword">subversion </span>\</span><br><span class="line"><span class="label">libncurses5</span>-dev ncurses-term zlib1g-dev gawk git-core</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><a href="https://dev.openwrt.org/wiki/GetSource" target="_blank" rel="external">openwrt source code</a></p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$ </span>git clone <span class="symbol">http:</span>/<span class="regexp">/git.openwrt.org/</span><span class="number">12.09</span>/openwrt.git</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>change directory </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cd</span> openwrt</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>change default feed.conf name</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ mv feeds<span class="class">.conf</span><span class="class">.default</span> feeds.conf</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>update &amp; install all package</p>
+<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ ./scripts/feeds update -<span class="literal">a</span></span><br><span class="line">$ ./scripts/feeds install -<span class="literal">a</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Install LUCI</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ./scripts/feeds install -<span class="tag">a</span> luci</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Adding Openvswitch feed, update &amp; install</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ echo <span class="string">'src-git openvswitch git://github.com/ttsubo/openvswitch.git'</span> &gt;&gt; feeds<span class="class">.conf</span></span><br><span class="line">$ ./scripts/feeds update openvswitch</span><br><span class="line">$ ./scripts/feeds install -<span class="tag">a</span> -<span class="tag">p</span> openvswitch</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>menuconfig</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$ </span>make menuconfig</span><br></pre></td></tr></table></figure>
+<ul>
+<li>Target System: Atheros AR7xxx/AR9xxx</li>
+<li>Target Profile: TP-LINK TL-WR1043N/ND</li>
+<li>LuCI -&gt; Collections -&gt; luci </li>
+<li>Network -&gt; openvswitchswitch-common, openvswitch-ipsec, openvswitch-switch</li>
+</ul>
+</li>
+<li><p>Make</p>
+<figure class="highlight fix"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">make V</span>=<span class="string">s</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h3 id="OVS_設置">OVS 設置</h3><figure class="highlight vala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ ovs-vsctl <span class="keyword">set</span> bridge ovsbr0 protocols=OpenFlow10,OpenFlow13</span><br><span class="line">$ ovs-vsctl <span class="keyword">set</span>-fail-mode ovsbr0 standalone</span><br><span class="line"><span class="preprocessor"># 當沒連上 Controller 時作為一般的switch </span></span><br><span class="line">$ ovs-vsctl setcontroller ovsbr0 tcp:<span class="number">192.168</span>.8.126:<span class="number">6633</span></span><br><span class="line"><span class="preprocessor"># Setting Controller IP:192.168.8.126 Port:6633</span></span><br></pre></td></tr></table></figure>
+<h3 id="OVS_常用指令">OVS 常用指令</h3><figure class="highlight vala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ ovs-vsctl <span class="keyword">set</span> controller ovsbr0 tcp:<span class="number">192.168</span>.8.126:<span class="number">6633</span></span><br><span class="line"><span class="preprocessor"># Setting Controller IP:192.168.8.126 Port:6633</span></span><br><span class="line">$ ovs-vsctl show</span><br><span class="line"><span class="preprocessor"># Show virtual switch status</span></span><br><span class="line">$ ovs-ofctl dump-flows ovsbr0 -O openflow13</span><br><span class="line"><span class="preprocessor"># Dump flow table</span></span><br><span class="line">$ ovs-ofctl del-flows ovsbr0 -O openflow13</span><br><span class="line"><span class="preprocessor"># Delete flow table</span></span><br></pre></td></tr></table></figure>
+<h3 id="時間">時間</h3><hr>
+<p>一小時左右</p>
+<h3 id="參考資料">參考資料</h3><hr>
+<ul>
+<li><p><a href="http://ywang.logdown.com/posts/196787-openflow-13-for-openwrt" target="_blank" rel="external">OpenFlow 1.3 for OpenWRT on TP-LINK TL-WR1043ND</a></p>
+</li>
+<li><p><a href="https://github.com/ttsubo/openvswitch" target="_blank" rel="external">An Open vSwitch package for OpenWrt</a></p>
+</li>
+</ul>
+]]></content>
+    <summary type="html">
+    <![CDATA[<h3 id="前言">前言</h3><hr>
+<p>本篇記錄如何編譯OpenWrt 和把 OpenvSwitch 植入在 TL-1043ND 上</p>]]>
+    
+    </summary>
+    
+      <category term="Open vSwitch" scheme="http://linton.tw/tags/Open-vSwitch/"/>
+    
+      <category term="OpenFlow" scheme="http://linton.tw/tags/OpenFlow/"/>
+    
+      <category term="Openwrt" scheme="http://linton.tw/tags/Openwrt/"/>
+    
+      <category term="SDN" scheme="http://linton.tw/tags/SDN/"/>
+    
+      <category term="TL-1043ND" scheme="http://linton.tw/tags/TL-1043ND/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[[分享] 我的Vim設定檔]]></title>
+    <link href="http://linton.tw/2014/05/04/2014-05-04-share-my-vim-configuration-file/"/>
+    <id>http://linton.tw/2014/05/04/2014-05-04-share-my-vim-configuration-file/</id>
+    <published>2014-05-04T02:28:00.000Z</published>
+    <updated>2014-12-30T01:39:15.000Z</updated>
+    <content type="html"><![CDATA[<p>最近<a href="https://github.com/gmarik/Vundle.vim" target="_blank" rel="external">Vundle</a>更新了！安裝套件的指令由 <code>:BundleInstall</code> 改為 <code>:PluginInstall</code> </p>
+<p>剛剛更新了我的 <code>.vimrc</code> 就順勢把 vim 設定檔放在 GitHub 上做一下分享，有興趣的朋友可以參考。：）</p>
+<p><a href="https://github.com/John-Lin/linton.vim" target="_blank" rel="external">https://github.com/John-Lin/linton.vim</a></p>
+<p>Vim 截圖:<br><a id="more"></a><br><img src="http://user-image.logdown.io/user/3997/blog/4047/post/197067/RZHKICutRm6lWQQIX9z9_Screenshot%20from%202014-05-04%2018:36:56.png" alt="Screenshot from 2014-05-04 18:36:56.png"></p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>最近<a href="https://github.com/gmarik/Vundle.vim">Vundle</a>更新了！安裝套件的指令由 <code>:BundleInstall</code> 改為 <code>:PluginInstall</code> </p>
+<p>剛剛更新了我的 <code>.vimrc</code> 就順勢把 vim 設定檔放在 GitHub 上做一下分享，有興趣的朋友可以參考。：）</p>
+<p><a href="https://github.com/John-Lin/linton.vim">https://github.com/John-Lin/linton.vim</a></p>
+<p>Vim 截圖:<br>]]>
+    
+    </summary>
+    
+      <category term="Vim" scheme="http://linton.tw/tags/Vim/"/>
+    
+      <category term="Vundle" scheme="http://linton.tw/tags/Vundle/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[利用Yahoo Finance API, Amazon EC2訂閱全球匯率]]></title>
+    <link href="http://linton.tw/2014/03/19/2014-03-19-using-yahoo-finance-api-amazon-ec2-subscription-on-exchange-rates/"/>
+    <id>http://linton.tw/2014/03/19/2014-03-19-using-yahoo-finance-api-amazon-ec2-subscription-on-exchange-rates/</id>
+    <published>2014-03-19T07:56:00.000Z</published>
+    <updated>2014-12-30T01:39:15.000Z</updated>
+    <content type="html"><![CDATA[<h3 id="簡介">簡介</h3><hr>
+<p>這次又用 Python 寫了一個自動化的機器人，主要的功能是利用 Yahoo Finance API 截取使用者所關注的匯率。並可以設定極限值，並且一天兩次以 Email 的方式訂閱通知使用者（假日休市則不通知）。</p>
+<p>目前提供的功能有：<br><a id="more"></a></p>
+<ul>
+<li>當觸發匯率賣出高點時通知使用者可以考慮賣出，觸發匯率買入低點通知使用者可以考慮買入。</li>
+<li>每日最多訂閱兩次的匯率訊息，同時報價給多個使用者。</li>
+</ul>
+<p>因為 <a href="https://aws.amazon.com/free/" target="_blank" rel="external">Amazon EC2 有一年免費</a>的虛擬主機能用，於是就在上面裝了 Ubuntu 後開始24HR不中斷地截取全球匯率，監控匯率買賣高低點。</p>
+<h3 id="緣起">緣起</h3><hr>
+<p>這個作品除了 <del>展現 Python 的強大</del> 練功之外，還有就是我媽常抱怨他在 iOS 上沒有 App 告訴他，其他國家兌換新台幣是多少？而通常取而代之的都是兌換美金的 App 程式居多，變成她還需要去換算美金與新台幣的匯率，有點麻煩。</p>
+<h3 id="特色">特色</h3><hr>
+<p>值得一提的是，通常到一些銀行的網站上它只提供該家銀行的匯率買賣價格，但是這個價格不會是真正的價格，所以我沒去截取銀行網站上的匯率牌價。<br>原因是銀行總是要賺錢嘛！所以買入賣出都會對他有利，這也就是會造成各家銀行都會有自己的匯率牌價。</p>
+<p>而目前我是利用 Yahoo Finance API 去截取匯率的 <strong>公定價格</strong> 好讓使用者做比較。至於什麼是 <strong>公定價格</strong> ？</p>
+<p>假設一個情況：我需要換一大筆的外匯，但是我又怕某銀行賺我太多的匯差，我勢必要去與所謂的 <strong>公定價格</strong> 做比較，後再來與銀行（協ㄕㄚ調ㄐㄧㄚˋ）價格，或甚至換一家自己覺得價格相對較優的銀行，所以這時候 <strong>公定價格</strong> 就有其重要性啦。</p>
+<h3 id="Source_code">Source code</h3><hr>
+<p>因為有分幾個檔案寫模組，就不貼上來可以到我的GitHub上看:<br><a href="https://github.com/John-Lin/pyexchange" target="_blank" rel="external">https://github.com/John-Lin/pyexchange</a></p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<h3 id="簡介">簡介</h3><hr>
+<p>這次又用 Python 寫了一個自動化的機器人，主要的功能是利用 Yahoo Finance API 截取使用者所關注的匯率。並可以設定極限值，並且一天兩次以 Email 的方式訂閱通知使用者（假日休市則不通知）。</p>
+<p>目前提供的功能有：<br>]]>
+    
+    </summary>
+    
+      <category term="Amazon EC2" scheme="http://linton.tw/tags/Amazon-EC2/"/>
+    
+      <category term="Python" scheme="http://linton.tw/tags/Python/"/>
+    
+      <category term="Yahoo Finance API" scheme="http://linton.tw/tags/Yahoo-Finance-API/"/>
+    
+      <category term="exchange rate" scheme="http://linton.tw/tags/exchange-rate/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[[筆記] Install Ryu 3.6 - SDN Framework ]]></title>
+    <link href="http://linton.tw/2014/02/15/2014-02-15-note-install-ryu-36-sdn-framework/"/>
+    <id>http://linton.tw/2014/02/15/2014-02-15-note-install-ryu-36-sdn-framework/</id>
+    <published>2014-02-14T23:47:00.000Z</published>
+    <updated>2014-12-30T01:39:15.000Z</updated>
+    <content type="html"><![CDATA[<h2 id="Continue…">Continue…</h2><hr>
+<p><a href="http://blog.linton.tw/posts/2014/01/11/install-ryu-3-5-sdn-framework" target="_blank" rel="external">延續上一篇</a>在安裝 Ryu 3.5 的過程遇上一些小地雷。有網友因為安裝失敗，寫信來問詳細安裝過程才赫然發現安裝 Ryu 3.6 的地雷似乎變少了! </p>
+<p>不過 Ryu 官方一直沒有把所需要的相依套件寫在首頁的 INSTALLATION IS A SNAP，而是寫在 Gitub 上的 <a href="https://github.com/osrg/ryu/wiki/Installing-Ryu" target="_blank" rel="external">Wiki</a> 這個小角落，造成按照 INSTALLATION IS A SNAP 的方法做的人 Ryu 執行會失敗。</p>
+<a id="more"></a>
+<p><strong>3/27 更新 :</strong> 安裝 Ryu 3.7 如果遇到 <code>pkg_resources.DistributionNotFound: six&gt;=1.4.0</code> 請嘗試以下方法：</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$ </span>sudo apt-get install curl </span><br><span class="line"><span class="variable">$ </span>sudo su</span><br><span class="line"><span class="variable">$ </span>curl <span class="symbol">https:</span>/<span class="regexp">/bitbucket.org/pypa</span><span class="regexp">/setuptools/raw</span><span class="regexp">/bootstrap/ez</span>_setup.py | python</span><br></pre></td></tr></table></figure>
+<p><strong>注意：需要取得 root 權限</strong></p>
+<ul>
+<li>資料來源：<a href="http://stackoverflow.com/questions/7446187/no-module-named-pkg-resources" target="_blank" rel="external">no module named pkg resources</a></li>
+</ul>
+<hr>
+<p><strong>3/19 更新 :</strong> Ryu 3.7 出來後又有一個套件 (gcc) 必須先裝好，在用 pip 安裝 <code>sudo pip install Ryu 3.7</code> 時，請先安裝好gcc<br><figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-<span class="keyword">get</span> install build-essential</span><br></pre></td></tr></table></figure></p>
+<h2 id="Install_on_Linux/Ubuntu">Install on Linux/Ubuntu</h2><hr>
+<p>這次主要紀錄，重剛灌好的 Linux/Ubuntu 上開始安裝 Ryu 的過程，強烈建議安裝 Ryu 時，使用 python pip 套件庫 Step by Step 來安裝。</p>
+<p><strong>Step 0 :</strong><br>安裝Ryu 之前需要下載 python 的套件庫，請用 <code>$sudo apt-get install</code> 來安裝，並且更新pip (因為下載下來的pip 並不是最新版本的)</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-get <span class="operator"><span class="keyword">install</span> python-pip python-dev build-essential</span><br><span class="line">$ sudo pip <span class="keyword">install</span> <span class="comment">--upgrade pip</span></span></span><br></pre></td></tr></table></figure>
+<p><strong>注意 :</strong> 套件 <code>python-dev</code> 是選用的安裝，因為 Ryu with GUI 裡面有個相依性的套件 <code>python-websocket</code> 需要 <code>python-dev</code> 故強烈建議安裝。</p>
+<p><strong>Step 1 :</strong><br>Ryu 有一些相依性的套件必須要安裝，請用 <code>sudo apt-get install</code> 來安裝</p>
+<ul>
+<li>python-eventlet</li>
+<li>python-routes</li>
+<li>python-webob</li>
+<li>python-paramiko</li>
+</ul>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-<span class="built_in">get</span> install <span class="keyword">python</span>-eventlet</span><br><span class="line">$ sudo apt-<span class="built_in">get</span> install <span class="keyword">python</span>-routes</span><br><span class="line">$ sudo apt-<span class="built_in">get</span> install <span class="keyword">python</span>-webob</span><br><span class="line">$ sudo apt-<span class="built_in">get</span> install <span class="keyword">python</span>-paramiko</span><br></pre></td></tr></table></figure>
+<p><strong>Step 2 :</strong><br>使用 pip 下載並安裝 Ryu</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo pip <span class="keyword">install</span> ryu</span><br></pre></td></tr></table></figure>
+<p><strong>Step 3 : [Option]</strong><br>若要使用 Ryu with GUI 此步驟要做，下載 Ryu source code (需要使用git 套件)<br><figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$ </span>sudo apt-get install git</span><br><span class="line"><span class="variable">$ </span>git clone <span class="symbol">https:</span>/<span class="regexp">/github.com/osrg</span><span class="regexp">/ryu.git</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>Step 4 :</strong><br>完成安裝後，請執行 ryu-manager 驗證看看有沒有出現錯誤，沒問題的話顯示的訊息應該像下面這樣:</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">linton@linton-virtual-machine ~ $ ryu-manager </span><br><span class="line">loading app ryu<span class="class">.controller</span><span class="class">.ofp_handler</span></span><br><span class="line">instantiating app ryu<span class="class">.controller</span><span class="class">.ofp_handler</span> of OFPHandler</span><br></pre></td></tr></table></figure>
+<h3 id="End…">End…</h3><hr>
+<p>若安裝過程還是有問題，可以寄信給我或是在下面留言與我討論 =)</p>
+<p>十分歡迎有在研究 SDN 的朋友一起討論!!<br>Email Address : <a href="&#109;&#x61;&#105;&#x6c;&#116;&#x6f;&#x3a;&#x6c;&#105;&#x6e;&#x74;&#x6f;&#110;&#64;&#x69;&#x69;&#x69;&#x2e;&#x6f;&#x72;&#x67;&#46;&#x74;&#119;">&#x6c;&#105;&#x6e;&#x74;&#x6f;&#110;&#64;&#x69;&#x69;&#x69;&#x2e;&#x6f;&#x72;&#x67;&#46;&#x74;&#119;</a>  ;  <a href="&#x6d;&#97;&#105;&#x6c;&#x74;&#111;&#58;&#x6c;&#x69;&#110;&#116;&#111;&#x6e;&#46;&#x74;&#119;&#x40;&#103;&#109;&#x61;&#105;&#x6c;&#46;&#99;&#111;&#109;">&#x6c;&#x69;&#110;&#116;&#111;&#x6e;&#46;&#x74;&#119;&#x40;&#103;&#109;&#x61;&#105;&#x6c;&#46;&#99;&#111;&#109;</a></p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<h2 id="Continue…">Continue…</h2><hr>
+<p><a href="http://blog.linton.tw/posts/2014/01/11/install-ryu-3-5-sdn-framework">延續上一篇</a>在安裝 Ryu 3.5 的過程遇上一些小地雷。有網友因為安裝失敗，寫信來問詳細安裝過程才赫然發現安裝 Ryu 3.6 的地雷似乎變少了! </p>
+<p>不過 Ryu 官方一直沒有把所需要的相依套件寫在首頁的 INSTALLATION IS A SNAP，而是寫在 Gitub 上的 <a href="https://github.com/osrg/ryu/wiki/Installing-Ryu">Wiki</a> 這個小角落，造成按照 INSTALLATION IS A SNAP 的方法做的人 Ryu 執行會失敗。</p>]]>
+    
+    </summary>
+    
+      <category term="OpenFlow" scheme="http://linton.tw/tags/OpenFlow/"/>
+    
+      <category term="Python" scheme="http://linton.tw/tags/Python/"/>
+    
+      <category term="Ryu" scheme="http://linton.tw/tags/Ryu/"/>
+    
+      <category term="SDN" scheme="http://linton.tw/tags/SDN/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[[筆記] How to set up Ryu controller with GUI component?]]></title>
+    <link href="http://linton.tw/2014/02/11/2014-02-11-note-how-to-set-up-ryu-controller-with-gui-component/"/>
+    <id>http://linton.tw/2014/02/11/2014-02-11-note-how-to-set-up-ryu-controller-with-gui-component/</id>
+    <published>2014-02-10T16:00:00.000Z</published>
+    <updated>2014-12-30T01:39:15.000Z</updated>
+    <content type="html"><![CDATA[<p>下圖是利用 Ryu 和 mininet 設計的一個簡單網路拓璞（三個switch, 四個host），並且用 Ryu with GUI 顯示在 Web 介面上。<br><img src="http://user-image.logdown.io/user/3997/blog/4047/post/178417/lcREdZ7SyK472OaDcDWP_Ryu_with_GUI.png" alt="Ryu_with_GUI.png"></p>
+<p>除了 <a href="http://osrg.github.io/ryu/" target="_blank" rel="external">Ryu</a> 之外，目前看過幾個比較熱門的 SDN Framwwork<br>例如: <a href="http://www.opendaylight.org/" target="_blank" rel="external">OpenDaylight</a>, <a href="http://www.projectfloodlight.org/floodlight/" target="_blank" rel="external">Floodlight</a>。上面三種 SDN Framwwork 都具有各自的 Web GUI 介面，目前看起來 Ryu 較為陽春（如上圖，可以發現 Ryu with GUI 並沒有畫出 host 的圖形），不過我相信很快就可以追上!</p>
+<a id="more"></a>
+<p>目前 <a href="https://github.com/yamada-h/ryu/tree/gui-patch-v3-rebase" target="_blank" rel="external">Ryu with GUI</a> 是由 <a href="https://github.com/yamada-h" target="_blank" rel="external">yamada-h</a>從 <a href="https://github.com/ntts-clo/ryu" target="_blank" rel="external">ntts-clo/ryu</a> 專案 fork 出來做的一個 patch。稍微追了一下發現 <a href="https://github.com/ntts-clo/ryu" target="_blank" rel="external">ntts-clo/ryu</a> 是從原官方專案 <a href="https://github.com/osrg/ryu" target="_blank" rel="external">osrg/ryu</a> fork 出來的。</p>
+<h3 id="Architecture">Architecture</h3><hr>
+<p>Ryu with GUI 的架構圖如下圖：<br><img class="center" src="http://user-image.logdown.io/user/3997/blog/4047/post/178417/Vl8qvnPpSCWrdhwtlH8U_architecture.png" alt="architecture.png"></p>
+<h3 id="Requirements">Requirements</h3><hr>
+<p>Ryu with GUI 需要依賴以下幾個 python 套件，請先用 <code>pip install</code> 安裝好:</p>
+<ul>
+<li>Ryu (<a href="http://blog.linton.tw/posts/2014/01/11/install-ryu-sdn-framework" target="_blank" rel="external">Install Ryu SDN Framework</a>)</li>
+<li>Flask (Python 上一個非常知名的輕量化 Web Famework)</li>
+<li>gevent-websocket (在Web Browser 與 GUI Server做聯繫的套件)</li>
+</ul>
+<p>注意:在安裝 <strong>gevent-websocket</strong> 之前，需要先安裝 <strong>python-dev</strong> 可以使用以下指令進行安裝:</p>
+<figure class="highlight q"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-<span class="built_in">get</span> install python-<span class="built_in">dev</span></span><br></pre></td></tr></table></figure>
+<h3 id="Add_Patch">Add Patch</h3><hr>
+<p>前面有稍微提過，Ryu with GUI 並不包含在官方提供的 source code 裡面，需要再加入一些 patch 好讓 Ryu with GUI 運作。</p>
+<p>由此 <a href="https://github.com/yamada-h/ryu/archive/gui-patch-v3-rebase.zip" target="_blank" rel="external">gui-patch-v3-rebase</a> 下載 ZIP 解壓縮後在路徑 <code>/gui-patch-v3-rebase/ryu/gui</code> 將 gui 整個資料夾複製到原官方 Ryu 專案相同位置的地方(<code>/ryu/ryu/</code>)。接著要到 <code>/ryu/ryu/topology</code> 修改 <code>switches.py</code> 45行-53行的地方註解掉。</p>
+<p><img src="http://user-image.logdown.io/user/3997/blog/4047/post/178417/mQbRUzATS5SxIFVgUr2M_switches.png" alt="switches.png"></p>
+<h3 id="Usage">Usage</h3><hr>
+<ul>
+<li><strong>Running Ryu</strong><br>執行 Ryu with GUI 需要以下幾個應用程式透過 REST API 與 GUI Server 溝通</li>
+</ul>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ryu-manager --verbose --observe-links ryu<span class="class">.topology</span><span class="class">.switches</span> ryu<span class="class">.app</span><span class="class">.rest_topology</span> ryu<span class="class">.app</span><span class="class">.ofctl_rest</span> ryu<span class="class">.app</span><span class="class">.simple_switch</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>Running GUI server</strong></li>
+</ul>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ./ryu/<span class="keyword">gui</span>/controller.<span class="keyword">py</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>Topology GUI on Browser<br>若在同一台電腦上，請用瀏覽器到網址 <a href="http://127.0.0.1:8000" target="_blank" rel="external">http://127.0.0.1:8000</a></li>
+</ul>
+<h3 id="小結">小結</h3><hr>
+<p>設置過程並不困難，稍微注意一下 Add patch 步驟即可，但是感覺網路上能找的資料有一點少，所以做了一些筆記。<br>下次再來寫一篇 Ryu 和 Mininet 的結合使用。</p>
+<h3 id="參考資料">參考資料</h3><hr>
+<ul>
+<li><a href="https://github.com/yamada-h/ryu/wiki/GUI" target="_blank" rel="external">Ryu GUI wiki</a></li>
+<li><a href="http://www.sdnap.com/wp-content/uploads/others/Ryu_and_GUI_installaion_from_king-nanjing_sdnap.pdf" target="_blank" rel="external">文刀分享 之 Ryu GUI 搭建</a></li>
+</ul>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>下圖是利用 Ryu 和 mininet 設計的一個簡單網路拓璞（三個switch, 四個host），並且用 Ryu with GUI 顯示在 Web 介面上。<br><img src="http://user-image.logdown.io/user/3997/blog/4047/post/178417/lcREdZ7SyK472OaDcDWP_Ryu_with_GUI.png" alt="Ryu_with_GUI.png"></p>
+<p>除了 <a href="http://osrg.github.io/ryu/">Ryu</a> 之外，目前看過幾個比較熱門的 SDN Framwwork<br>例如: <a href="http://www.opendaylight.org/">OpenDaylight</a>, <a href="http://www.projectfloodlight.org/floodlight/">Floodlight</a>。上面三種 SDN Framwwork 都具有各自的 Web GUI 介面，目前看起來 Ryu 較為陽春（如上圖，可以發現 Ryu with GUI 並沒有畫出 host 的圖形），不過我相信很快就可以追上!</p>]]>
+    
+    </summary>
+    
+      <category term="Flask" scheme="http://linton.tw/tags/Flask/"/>
+    
+      <category term="OpenFlow" scheme="http://linton.tw/tags/OpenFlow/"/>
+    
+      <category term="Python" scheme="http://linton.tw/tags/Python/"/>
+    
+      <category term="Ryu with GUI" scheme="http://linton.tw/tags/Ryu-with-GUI/"/>
+    
+      <category term="SDN" scheme="http://linton.tw/tags/SDN/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[[筆記] Ryu controller app - Dumb layer 2 switch]]></title>
+    <link href="http://linton.tw/2014/02/09/2014-02-09-note-ryu-controller-app-dumb-layer-2-switch/"/>
+    <id>http://linton.tw/2014/02/09/2014-02-09-note-ryu-controller-app-dumb-layer-2-switch/</id>
+    <published>2014-02-08T16:00:00.000Z</published>
+    <updated>2014-12-30T01:39:15.000Z</updated>
+    <content type="html"><![CDATA[<p>根據 <a href="http://osrg.github.io/ryu/" target="_blank" rel="external">Ryu</a> 所提供的<a href="http://ryu.readthedocs.org/en/latest/writing_ryu_app.html#start-writing" target="_blank" rel="external">官方文件</a>第一個實作的應用程式，他們把它稱為<br><strong>dumb layer 2 switch</strong> 我很好奇為什麼稱呼他為 <strong>dumb layer 2 switch</strong>？</p>
+<p>或許是因為 dumb（愚笨的）的關係？在他的 source code 中表現出來的行為，我覺得它更像是一台 layer 1 的 Hub。</p>
+<a id="more"></a>
+<p>稍微複習一下 Hub 與 Switch 的差別，其實很容易區分它們二者的差異性。</p>
+<ul>
+<li><p>Hub（集線器）:<br>在<a href="http://www.pcnet.idv.tw/pcnet/network/network_ip_model.htm" target="_blank" rel="external">網路層級</a>中屬於 L1 同一個集線器底下所有的 host 連接的 port 都是可以互通的，也就是說 host A 傳給 host B 是以 Broadcasting 的方式送出去，而在集線器底下所有的 host 都能看見這個封包，其他的 host 雖然會收到，但是因為接收者不是他，就直接丟棄了（但也可以不丟棄，因此有網路安全上的疑慮）。</p>
+</li>
+<li><p>Switch（交換器） :<br>交換器與集線器最大的差別就在於，交換器能依照每一個 port 記錄每一個 host 的 MAC Address 因此不再需要每次都以 Broadcasting 的方式送資料，而是針對性的對某一個 port 發送資料，每一個 port 都是獨立的。<br>但是它在第一次接上數個 host 時並不知道哪一個 port 對應到哪一個 host 它會經過學習（MAC learning），而建立一張表。</p>
+</li>
+</ul>
+<p>接著來看看第一個程式 <code>DumbL2Switch.py</code></p>
+<figure class="highlight python"><figcaption><span>DumbL2Switch.py</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> ryu.base <span class="keyword">import</span> app_manager</span><br><span class="line"><span class="keyword">from</span> ryu.controller <span class="keyword">import</span> ofp_event</span><br><span class="line"><span class="keyword">from</span> ryu.controller.handler <span class="keyword">import</span> MAIN_DISPATCHER</span><br><span class="line"><span class="keyword">from</span> ryu.controller.handler <span class="keyword">import</span> set_ev_cls</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">L2Switch</span><span class="params">(app_manager.RyuApp)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, *args, **kwargs)</span>:</span></span><br><span class="line">        super(L2Switch, self).__init__(*args, **kwargs)</span><br><span class="line"></span><br><span class="line">    <span class="decorator">@set_ev_cls(ofp_event.EventOFPPacketIn, MAIN_DISPATCHER)</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">packet_in_handler</span><span class="params">(self, ev)</span>:</span></span><br><span class="line">        msg = ev.msg</span><br><span class="line">        dp = msg.datapath</span><br><span class="line">        ofp = dp.ofproto</span><br><span class="line">        ofp_parser = dp.ofproto_parser</span><br><span class="line"></span><br><span class="line">        actions = [ofp_parser.OFPActionOutput(ofp.OFPP_FLOOD)]</span><br><span class="line">        out = ofp_parser.OFPPacketOut(</span><br><span class="line">            datapath=dp, buffer_id=msg.buffer_id, in_port=msg.in_port,</span><br><span class="line">            actions=actions)</span><br><span class="line">        dp.send_msg(out)</span><br></pre></td></tr></table></figure>
+<h4 id="稍微_不負責任地_解讀一下這個應用程式">稍微 <del>不負責任地</del> 解讀一下這個應用程式</h4><p>在定義 <code>packet_in_handler()</code> 函式之前加上 @ 修飾子的語法（decorator）依我對 decorator 的理解。它是用來對 <code>packet_in_handler()</code> 函式做包裝（修飾），可以在 <code>packet_in_handler()</code> 函式的進入點及離開點增加一些行為，換句話說 <code>@set_ev_cls</code> 幫你做了某些事，是在進入 <code>packet_in_handler()</code> 之後或離開之前幫你做完某些事情。</p>
+<p>至於實際上做了什麼事情，這邊我不太了解需要去追一下<a href="https://github.com/osrg/ryu/blob/master/ryu/controller/handler.py#L31" target="_blank" rel="external">這段程式碼</a>，不過可以確定的是需要傳兩個參數進去 <code>ofp_event.EventOFPPacketIn</code> 與 <code>MAIN_DISPATCHER</code></p>
+<p><code>packet_in_handler()</code> 如同函式的名稱一樣，當封包來的時候要處理些什麼事情，裏面做的事情很單純 <code>msg.datapath</code> 拿到 datapath，<code>dp.ofproto</code> 與 <code>dp.ofproto_parser</code> 得到 OpenFlow protocol</p>
+<p>重點在 <code>ofp_parser.OFPActionOutput()</code> 做出 <code>ofp.OFPP_FLOOD</code> 意思是向所有的 Physical ports 發送訊息，其物理意義是廣播（Broadcasting）</p>
+<p>最後由 <code>ofp_parser.OFPPacketOut()</code> 把所有資訊做個包裝，再用 <code>dp.send_msg</code> 送出去。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>根據 <a href="http://osrg.github.io/ryu/">Ryu</a> 所提供的<a href="http://ryu.readthedocs.org/en/latest/writing_ryu_app.html#start-writing">官方文件</a>第一個實作的應用程式，他們把它稱為<br><strong>dumb layer 2 switch</strong> 我很好奇為什麼稱呼他為 <strong>dumb layer 2 switch</strong>？</p>
+<p>或許是因為 dumb（愚笨的）的關係？在他的 source code 中表現出來的行為，我覺得它更像是一台 layer 1 的 Hub。</p>]]>
+    
+    </summary>
+    
+      <category term="OpenFlow" scheme="http://linton.tw/tags/OpenFlow/"/>
+    
+      <category term="Python" scheme="http://linton.tw/tags/Python/"/>
+    
+      <category term="Ryu" scheme="http://linton.tw/tags/Ryu/"/>
+    
+      <category term="SDN" scheme="http://linton.tw/tags/SDN/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[[Bug] Office for Mac 2011 快捷鍵失效之有效解決方法]]></title>
+    <link href="http://linton.tw/2014/01/31/2014-01-31-bug-office-for-mac-2011-shortcuts-fail/"/>
+    <id>http://linton.tw/2014/01/31/2014-01-31-bug-office-for-mac-2011-shortcuts-fail/</id>
+    <published>2014-01-31T08:45:00.000Z</published>
+    <updated>2014-12-30T01:39:15.000Z</updated>
+    <content type="html"><![CDATA[<p><img src="http://user-image.logdown.io/user/3997/blog/4047/post/177729/Vk89xunLSACIuZoBjd8w_188509.jpg" alt="188509.jpg"></p>
+<p>常常在 Mac 上使用 Office 做文書處理一定有快捷鍵失效這個困擾，而此問題已經存在很久目前看起來 Microsoft 也不太想要解決？</p>
+<a id="more"></a>
+<p>當在 Word 上使用快捷鍵，例如： ⌘+C 複製、 ⌘+V 貼上、 ⌘+A 全選、 ⌘+S 存檔、 ⌘+Z 還原。通常在趕報告的夜晚，會讓人很抓狂！這個可是從 <del>石器時代</del> 就已經有的好工具，怎麼能夠就這樣在 Mac 上失效！</p>
+<p>注意：</p>
+<blockquote>
+<p>快捷鍵失效跟輸入法有關！</p>
+</blockquote>
+<p>除了可以重設輸入法之外，這邊提供一個 <strong>非常有效</strong> 的解決方法，只要在 Word 尚未開啟之前（整個程式都未執行，Dock 尚未亮起指示燈）的時候 <strong>先將輸入法改回英文</strong> ，再開啟 Word 就不會失效了！當然開啟之後你就可以正常的使用注音輸入法，及各種快捷鍵。</p>
+<ul>
+<li><a href="http://www.ptt.cc/bbs/MAC/M.1357447965.A.746.html" target="_blank" rel="external">參考資料</a></li>
+</ul>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p><img src="http://user-image.logdown.io/user/3997/blog/4047/post/177729/Vk89xunLSACIuZoBjd8w_188509.jpg" alt="188509.jpg"></p>
+<p>常常在 Mac 上使用 Office 做文書處理一定有快捷鍵失效這個困擾，而此問題已經存在很久目前看起來 Microsoft 也不太想要解決？</p>]]>
+    
+    </summary>
+    
+      <category term="mac" scheme="http://linton.tw/tags/mac/"/>
+    
+      <category term="office 2011" scheme="http://linton.tw/tags/office-2011/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[[筆記] Install Ryu 3.5 - SDN Framework ]]></title>
+    <link href="http://linton.tw/2014/01/11/2014-01-11-install-ryu-3-5-sdn-framework/"/>
+    <id>http://linton.tw/2014/01/11/2014-01-11-install-ryu-3-5-sdn-framework/</id>
+    <published>2014-01-10T19:58:00.000Z</published>
+    <updated>2014-12-30T01:39:15.000Z</updated>
+    <content type="html"><![CDATA[<p>在安裝 Ryu 的過程中並沒有像官方網站所說的那麼順利，踩到一些莫名的小地雷在這邊做一下筆記。</p>
+<h3 id="[更新_2014/02/15]_這是_Ryu_3-5_時做的筆記，目前已經更新為_Ryu_3-6_請參考[最新版的安裝方法]!">[更新 2014/02/15] 這是 Ryu 3.5 時做的筆記，目前已經更新為 Ryu 3.6 請參考[最新版的安裝方法]!</h3><h3 id="[問題]">[問題]</h3><hr>
+<p><a href="http://osrg.github.io/ryu/" target="_blank" rel="external"><strong>官方版安裝方教學</strong></a> 宣稱可以選用<br><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo pip <span class="keyword">install</span> ryu</span><br></pre></td></tr></table></figure></p>
+<p>或是從 Github 上 clone 原始碼下來安裝</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git clone http<span class="variable">s:</span>//github.<span class="keyword">com</span>/osrg/ryu.git</span><br><span class="line">$ <span class="keyword">cd</span> ryu; <span class="keyword">python</span> ./setup.<span class="keyword">py</span> install</span><br></pre></td></tr></table></figure>
+<p>以上兩種我都試過， <strong>沒辦法順利的安裝</strong> ，似乎會少一些相依性的套件？</p>
+<a id="more"></a>
+<h3 id="[解決方法]">[解決方法]</h3><hr>
+<p>我先用 <code>sudo pip install ryu</code> 之後 ，在執行 <code>ryu-manager</code> 時會出現一些錯誤，請注意最後幾行錯誤訊息，會抱怨少了什麼套件，套件名稱如下請用 <code>sudo pip install</code>手動重新裝過補齊（大約缺了5個套件）。</p>
+<p>這邊列出缺少的套件，請用 <code>sudo pip install</code> 逐一安裝</p>
+<ul>
+<li>msgpack-python </li>
+<li>oslo.config </li>
+<li>netaddr </li>
+<li>lxml</li>
+<li>ecdsa</li>
+</ul>
+<p><strong>請注意：</strong>其中有一個套件 <strong>lxml</strong> 在使用 <code>sudo pip install lxml</code> 也沒辦法順利安裝，似乎又少了某些相依的函式庫?</p>
+<p>請將 <strong>lxml</strong> 所需要的函式庫補齊，在 Command Line 下安裝以下的套件：</p>
+<figure class="highlight q"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-<span class="built_in">get</span> install libxml2-<span class="built_in">dev</span> libxslt1-<span class="built_in">dev</span> python2.7-<span class="built_in">dev</span></span><br></pre></td></tr></table></figure>
+<p>將 lxml 裝上之後，在執行 <code>ryu-manger</code> 時還會抱怨少一個套件 <strong>(ecdsa)</strong> ，再用 <code>sudo pip isntall</code> 裝上，就可以順利執行。</p>
+<h3 id="[2014/1/14_新增]">[2014/1/14 新增]</h3><hr>
+<p>Ryu 有一些相依性的套件必須要安裝，請用 <code>sudo apt-get install</code> 來安裝</p>
+<ul>
+<li>python-eventlet</li>
+<li>python-routes</li>
+<li>python-webob</li>
+<li>python-paramiko</li>
+</ul>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-<span class="built_in">get</span> install <span class="keyword">python</span>-eventlet <span class="keyword">python</span>-routes <span class="keyword">python</span>-webob <span class="keyword">python</span>-paramiko</span><br></pre></td></tr></table></figure>
+<hr>
+<p>若安裝過程還是有問題，可以寄信給我或是在下面留言與我討論 =)</p>
+<p>十分歡迎有在研究 SDN 的朋友一起討論!!<br>Email Address : <a href="&#109;&#x61;&#x69;&#108;&#x74;&#x6f;&#x3a;&#x6c;&#105;&#110;&#x74;&#x6f;&#x6e;&#x40;&#105;&#105;&#x69;&#x2e;&#x6f;&#114;&#103;&#x2e;&#x74;&#x77;">&#x6c;&#105;&#110;&#x74;&#x6f;&#x6e;&#x40;&#105;&#105;&#x69;&#x2e;&#x6f;&#114;&#103;&#x2e;&#x74;&#x77;</a>  ;  <a href="&#109;&#x61;&#x69;&#108;&#116;&#x6f;&#58;&#105;&#114;&#x65;&#x72;&#x69;&#x33;&#x33;&#57;&#64;&#x67;&#109;&#97;&#x69;&#108;&#x2e;&#x63;&#111;&#x6d;">&#105;&#114;&#x65;&#x72;&#x69;&#x33;&#x33;&#57;&#64;&#x67;&#109;&#97;&#x69;&#108;&#x2e;&#x63;&#111;&#x6d;</a></p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>在安裝 Ryu 的過程中並沒有像官方網站所說的那麼順利，踩到一些莫名的小地雷在這邊做一下筆記。</p>
+<h3 id="[更新_2014/02/15]_這是_Ryu_3-5_時做的筆記，目前已經更新為_Ryu_3-6_請參考[最新版的安裝方法]!">[更新 2014/02/15] 這是 Ryu 3.5 時做的筆記，目前已經更新為 Ryu 3.6 請參考[最新版的安裝方法]!</h3><h3 id="[問題]">[問題]</h3><hr>
+<p><a href="http://osrg.github.io/ryu/"><strong>官方版安裝方教學</strong></a> 宣稱可以選用<br><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo pip <span class="keyword">install</span> ryu</span><br></pre></td></tr></table></figure></p>
+<p>或是從 Github 上 clone 原始碼下來安裝</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git clone http<span class="variable">s:</span>//github.<span class="keyword">com</span>/osrg/ryu.git</span><br><span class="line">$ <span class="keyword">cd</span> ryu; <span class="keyword">python</span> ./setup.<span class="keyword">py</span> install</span><br></pre></td></tr></table></figure>
+<p>以上兩種我都試過， <strong>沒辦法順利的安裝</strong> ，似乎會少一些相依性的套件？</p>]]>
+    
+    </summary>
+    
+      <category term="OpenFlow" scheme="http://linton.tw/tags/OpenFlow/"/>
+    
+      <category term="Python" scheme="http://linton.tw/tags/Python/"/>
+    
+      <category term="Ryu" scheme="http://linton.tw/tags/Ryu/"/>
+    
+      <category term="SDN" scheme="http://linton.tw/tags/SDN/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[Raspberry Pi X SHT15 溫濕度偵測]]></title>
+    <link href="http://linton.tw/2013/12/03/2013-12-03-raspberry-pi-x-sht15-humidity-detection/"/>
+    <id>http://linton.tw/2013/12/03/2013-12-03-raspberry-pi-x-sht15-humidity-detection/</id>
+    <published>2013-12-03T01:26:00.000Z</published>
+    <updated>2014-12-30T01:39:15.000Z</updated>
+    <content type="html"><![CDATA[<h3 id="Raspberry_Pi_(樹莓派)">Raspberry Pi (樹莓派)</h3><hr>
+<p><a href="http://www.raspberrypi.org/" target="_blank" rel="external">Raspberry Pi</a> 是一台信用卡般大小的小型電腦，上面可以搭載 Linux 作業系統，它由英國的樹莓派基金會所開發，目的是以低價硬體及自由軟體刺激在學校的基本的電腦科學教育。除了與一般電腦一樣具備USB Port, HDMI, Ethernet, SD Slot 等等之外，特別的是在這個平台上提供 26 個腳位可以做簡單的控制，透過 C, Python, Java 等程式語言的第三方函式庫供開發者做一個簡單的原型開發。</p>
+<p><a href="http://www.flickr.com/photos/98836972@N05/11175565574/" title="Flickr 上 哲緯林 的 IMG_9473" target="_blank" rel="external"><img src="http://farm3.staticflickr.com/2889/11175565574_77ca80ab50_c.jpg" width="800" height="534" alt="IMG_9473"></a></p>
+<a id="more"></a>
+<h3 id="SHT15_溫濕度感測模組">SHT15 溫濕度感測模組</h3><hr>
+<p>SHT15 是一個數位的溫濕度感知器，可以偵測環境中溫度與濕度。本文將使用 SHT15 與 Raspberry Pi 的 GPIO 做連結，來偵測環境中的溫濕度。</p>
+<p><a href="http://www.flickr.com/photos/98836972@N05/11175577904/" title="Flickr 上 哲緯林 的 IMG_9470" target="_blank" rel="external"><img src="http://farm6.staticflickr.com/5515/11175577904_7c68fc5188_c.jpg" width="800" height="534" alt="IMG_9470"></a></p>
+<h3 id="事前準備工作">事前準備工作</h3><hr>
+<ol>
+<li>硬體部分<ul>
+<li>Raspberry Pi<ul>
+<li>SHT15</li>
+<li>麵包板</li>
+<li>若干跳線</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>軟體部分<ul>
+<li>Python 2.7<ul>
+<li>RPi.GPIO 套件</li>
+<li>rpiSht1x 套件</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<p>此次使用 Python 的 <a href="https://pypi.python.org/pypi/RPi.GPIO/0.5.3a" target="_blank" rel="external">RPi.GPIO</a> 搭配 <a href="https://pypi.python.org/pypi/rpiSht1x" target="_blank" rel="external">rpiSht1x</a> 函式庫來偵測環境中溫濕度，可以使用 <code>pip install</code> 來安裝該套件。</p>
+<h3 id="實做流程">實做流程</h3><hr>
+<h4 id="硬體接線">硬體接線</h4><p>SHT15 腳位有VCC, GND, SCK, DATA 將 VCC 接到 Raspberry Pi 的腳位2、GND 接腳位6、SCK 接腳位7、DATA 接腳位11。</p>
+<p>請參考 Raspberry Pi 腳位圖<br><img src="http://pi4j.com/images/gpio-control-example-large.png" alt="pin.png"></p>
+<p>實際接線圖<br><a href="http://www.flickr.com/photos/98836972@N05/11175811893/" title="Flickr 上 哲緯林 的 IMG_9476" target="_blank" rel="external"><img src="http://farm4.staticflickr.com/3730/11175811893_f68e1edaca_c.jpg" width="800" height="534" alt="IMG_9476"></a></p>
+<h4 id="軟體程式_(Python_Source_code)">軟體程式 (Python Source code)</h4><p>程式功能為<code>每5秒</code>偵測一次環境溫濕度，並顯示。</p>
+<figure class="highlight"><figcaption><span>hygro.py</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">import time</span><br><span class="line">import datetime</span><br><span class="line">import sys</span><br><span class="line">from sht1x.Sht1x import Sht1x as SHT1x</span><br><span class="line"></span><br><span class="line">dataPin = 11</span><br><span class="line">clkPin = 7</span><br><span class="line">sht1x = SHT1x(dataPin, clkPin, SHT1x.GPIO_BOARD)</span><br><span class="line"></span><br><span class="line">def detect():</span><br><span class="line">    t = time.time()</span><br><span class="line">    current_time = time.strftime('%H:%M:%S', time.localtime(t))</span><br><span class="line">    temperature = sht1x.read_temperature_C()</span><br><span class="line">    humidity = sht1x.read_humidity()</span><br><span class="line">    dewPoint = sht1x.calculate_dew_point(temperature, humidity)</span><br><span class="line">    return current_time, round(temperature,2), round(humidity,2), round(dewPoint,2)</span><br><span class="line"></span><br><span class="line">def main():</span><br><span class="line">    while True:</span><br><span class="line">        try:</span><br><span class="line">            (current_time, temperature, humidity, dewPoint) = detect()</span><br><span class="line">            print("Time:%s  Temperature:%2.1f`C  Humidity:%2.2f%%  </span><br><span class="line">            	Dew Point:%2.1f`C" %(current_time, temperature, humidity, dewPoint))</span><br><span class="line">            time.sleep(5)</span><br><span class="line">        except KeyboardInterrupt, e:</span><br><span class="line">            print e</span><br><span class="line">            sys.exit()</span><br><span class="line"></span><br><span class="line">if __name__ == '__main__':</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+<h3 id="展示照片">展示照片</h3><hr>
+<p>因為 Raspberry Pi 有 USB Port 可以接 Wi-Fi USB Adapters，此外因為他的耗電量極小，可以接上可以供給 2A 電流的行動電源，將整個裝置脫離插頭、網路分享器，放到我想放的地方。</p>
+<p>例如：最近購買電子防潮箱，想來測試一下濕度計夠不夠精準。</p>
+<p>供給 2A 電流的行動電源<br><a href="http://www.flickr.com/photos/98836972@N05/11175651536/" title="Flickr 上 哲緯林 的 IMG_9478" target="_blank" rel="external"><img src="http://farm8.staticflickr.com/7313/11175651536_f5894e5d50_c.jpg" width="800" height="534" alt="IMG_9478"></a></p>
+<p>脫離有線網路，採用 Wi-Fi USB Adapters<br><a href="http://www.flickr.com/photos/98836972@N05/11175638196/" title="Flickr 上 哲緯林 的 IMG_9483" target="_blank" rel="external"><img src="http://farm6.staticflickr.com/5535/11175638196_6d08ac245c_c.jpg" width="800" height="534" alt="IMG_9483"></a></p>
+<p>放入電子防潮箱，透過 SSH 可以取得溫濕度資料<br><a href="http://www.flickr.com/photos/98836972@N05/11175651484/" title="Flickr 上 哲緯林 的 IMG_9489" target="_blank" rel="external"><img src="http://farm4.staticflickr.com/3737/11175651484_6895c23515_c.jpg" width="800" height="534" alt="IMG_9489"></a></p>
+<p>透過 SSH 我可以遠端連線上 Raspberry Pi 並執行程式，可以取得溫濕度。<br>此張照片是 Raspberry Pi 從防潮箱拿出來的記錄，可以很明顯地看見，濕度提高了接近 10%<br><a href="http://www.flickr.com/photos/98836972@N05/11175611134/" title="Flickr 上 哲緯林 的 IMG_9492" target="_blank" rel="external"><img src="http://farm8.staticflickr.com/7312/11175611134_672ac5489d_c.jpg" width="800" height="534" alt="IMG_9492"></a></p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<h3 id="Raspberry_Pi_(樹莓派)">Raspberry Pi (樹莓派)</h3><hr>
+<p><a href="http://www.raspberrypi.org/">Raspberry Pi</a> 是一台信用卡般大小的小型電腦，上面可以搭載 Linux 作業系統，它由英國的樹莓派基金會所開發，目的是以低價硬體及自由軟體刺激在學校的基本的電腦科學教育。除了與一般電腦一樣具備USB Port, HDMI, Ethernet, SD Slot 等等之外，特別的是在這個平台上提供 26 個腳位可以做簡單的控制，透過 C, Python, Java 等程式語言的第三方函式庫供開發者做一個簡單的原型開發。</p>
+<p><a href="http://www.flickr.com/photos/98836972@N05/11175565574/" title="Flickr 上 哲緯林 的 IMG_9473"><img src="http://farm3.staticflickr.com/2889/11175565574_77ca80ab50_c.jpg" width="800" height="534" alt="IMG_9473"></a></p>]]>
+    
+    </summary>
+    
+      <category term="Python" scheme="http://linton.tw/tags/Python/"/>
+    
+      <category term="Raspberry Pi" scheme="http://linton.tw/tags/Raspberry-Pi/"/>
+    
+      <category term="SHT15" scheme="http://linton.tw/tags/SHT15/"/>
+    
+  </entry>
+  
+</feed>

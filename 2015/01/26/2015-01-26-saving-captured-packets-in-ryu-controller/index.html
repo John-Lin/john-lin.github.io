@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+    
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="John&#39;s Lin Blog">
+    <title>Saving captured packets in Ryu controller - John&#39;s Lin Blog</title>
+    <meta name="author" content="John Lin">
+    <meta name="description" content="John&#39;s Lin Blog">
+    <link rel="icon" href="/assets/images/favicon.ico">
+    
+        <link rel="alternative" type="application/atom+xml" title="RSS" href="atom.xml">
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style.min.css" type="text/css">
+    <!--STYLES END-->
+    
+    <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-47712773-1']);
+        _gaq.push(['_trackPageview']);
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+
+</head>
+
+    <body>
+        <div id="blog">
+            <header id="header">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars "></i>
+    <h1 class="header-title">
+        <a class="header-title-link" href="http://linton.tw">John&#39;s Lin Blog</a>
+    </h1>
+    
+        <a class="header-picture-link" href="/#about">
+            <img class="header-picture" src="http://www.gravatar.com/avatar/98b5759510e487ade4145247bc856366?s=90"/>
+        </a>
+    
+</header>
+            <nav id="sidebar">
+    
+        <div class="sidebar-profile">
+            <a href="/#about">
+                
+                    <img class="sidebar-profile-picture" src="http://www.gravatar.com/avatar/98b5759510e487ade4145247bc856366?s=90"/>
+                
+            </a>
+            <span class="sidebar-profile-name hide-md">John Lin</span>
+        </div>
+    
+    
+        <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+                        <span class="sidebar-button-desc hide-md">Home</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/all-categories">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+                        <span class="sidebar-button-desc hide-md">Categories</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/all-tags">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+                        <span class="sidebar-button-desc hide-md">Tags</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/all-archives">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+                        <span class="sidebar-button-desc hide-md">Archives</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/#about">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+                        <span class="sidebar-button-desc hide-md">About me</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://m103.nthu.edu.tw/~s103064502/" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-file-text"></i>
+                        <span class="sidebar-button-desc hide-md">Résumé</span>
+                    </a>
+                </li>
+            
+        </ul>
+    
+        <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="https://github.com/John-Lin/" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+                        <span class="sidebar-button-desc hide-md">GitHub</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="https://twitter.com/Linton_tw" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-twitter"></i>
+                        <span class="sidebar-button-desc hide-md">Twitter</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="mailto:// linton.tw@gmail.com" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-envelope-o"></i>
+                        <span class="sidebar-button-desc hide-md">Mail</span>
+                    </a>
+                </li>
+            
+        </ul>
+    
+        <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/atom.xml">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+                        <span class="sidebar-button-desc hide-md">RSS</span>
+                    </a>
+                </li>
+            
+        </ul>
+    
+</nav>
+            <div id="main">
+                
+<article class="post" itemscope itemType="http://schema.org/BlogPosting">
+    
+        <div class="post-header main-content-wrap">
+    
+        <h1 class="post-title" itemprop="headline">Saving captured packets in Ryu controller</h1>
+    
+    <div class="post-meta">
+    <time  itemprop="datePublished" content="Mon Jan 26 2015 16:15:14 GMT+0800">
+        Jan 26, 2015
+    </time>
+    
+</div>
+</div>
+    
+    <div class="post-content markdown main-content-wrap" itemprop="articleBody">
+        <p><img src="http://i2.minus.com/igLpHeXPT7LFt.png" alt="pcap"></p>
+<p>最近花了點時間研究 PCAP 的檔案格式，試著把 PCAP 的 Parser 用 Python 寫出來，本來就只是單純練習而躍躍欲試後結果。</p>
+<p>最終 lib 寫出來後就把這個 <a href="https://github.com/osrg/ryu/commit/3736b0c37d30d7f9be8e31a50258a852085f02cd" target="_blank" rel="external">patch</a> 送給 Ryu team 高興的是對方很快地就接受，並且跟我說這是個好東西。</p>
+<a id="more"></a>
+<h2 id="為什麼_patch_到_Ryu_Controller?">為什麼 patch 到 Ryu Controller?</h2><p>原因是後來想到有時候在 SDN Controller 上要開發 SDN Apps 因為某些原因需要把 Packet-In 的封包輸出來看，但是在 Controller 上直接把封包的內容直接輸出，顯示就只會看到一堆16進位的數值，還需要再透過各種方法把每種封包格式還原，實在是太傷神了。</p>
+<p>或許你可能會嘗試用 Wireshark 去抓封包來看，這是一個不錯的方法，但是我接下來想跟大家分享的是直接在 application 上直接呼叫 ryu.lib.pcaplib 來用可以更快的方法直接的把封包儲存下來看！</p>
+<h2 id="怎麼使用？">怎麼使用？</h2><ul>
+<li>把 pcaplib import 近來</li>
+<li>利用 <code>pcaplib.Writer()</code> 生一個物件，並餵入寫檔物件 <code>open(&#39;mypcap.pcap&#39;, &#39;wb&#39;)</code></li>
+<li>在有封包經過的 Handler 使用物件的 <code>write_pkt</code> method 並給予參數 <code>msg.data</code></li>
+</ul>
+<p>That’s it. 只需要上面三個步驟，就可以把封包存下來。唯一需要注意的是，通常會把它放在有封包經過的 Handler 可以參考以下的範例</p>
+<figure class="highlight python"><figcaption><span>pcapsave.py</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> ryu.lib <span class="keyword">import</span> pcaplib</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SimpleSwitch13</span><span class="params">(app_manager.RyuApp)</span>:</span></span><br><span class="line">    OFP_VERSIONS = [ofproto_v1_3.OFP_VERSION]</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, *args, **kwargs)</span>:</span></span><br><span class="line">        super(SimpleSwitch13, self).__init__(*args, **kwargs)</span><br><span class="line">        self.mac_to_port = &#123;&#125;</span><br><span class="line">        self.pcap_pen = pcaplib.Writer(open(<span class="string">'mypcap.pcap'</span>, <span class="string">'wb'</span>))</span><br><span class="line">        <span class="comment"># Creating an instance with a PCAP filename</span></span><br><span class="line">    <span class="decorator">@set_ev_cls(ofp_event.EventOFPPacketIn, MAIN_DISPATCHER)</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_packet_in_handler</span><span class="params">(self, ev)</span>:</span></span><br><span class="line">        msg = ev.msg</span><br><span class="line">        self.pcap_pen.write_pkt(msg.data)</span><br><span class="line">        <span class="comment"># Dump the data packet into PCAP file</span></span><br></pre></td></tr></table></figure>
+<p>另外還有提供讀取 PCAP 的 Class 如果需要的話可以參考以下的範例</p>
+<figure class="highlight python"><figcaption><span>pcapread.py</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> ryu.lib <span class="keyword">import</span> pcaplib</span><br><span class="line"><span class="keyword">from</span> ryu.lib.packet <span class="keyword">import</span> packet</span><br><span class="line"></span><br><span class="line">frame_count = <span class="number">0</span></span><br><span class="line"><span class="keyword">for</span> ts, buf <span class="keyword">in</span> pcaplib.Reader(open(<span class="string">'test.pcap'</span>, <span class="string">'rb'</span>)):</span><br><span class="line"><span class="comment"># Using the Reader iterator that yields packets in PCAP file</span></span><br><span class="line">		frame_count += <span class="number">1</span></span><br><span class="line">    pkt = packet.Packet(buf)</span><br><span class="line"></span><br><span class="line">    eth = pkt.get_protocols(ethernet.ethernet)[<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line">    dst = eth.dst</span><br><span class="line">    src = eth.src</span><br><span class="line"></span><br><span class="line">    <span class="keyword">print</span> frame_count, ts, dst, src, pkt</span><br><span class="line">    <span class="comment"># print frames count, timestamp, ethernet src, ethernet dst and raw packet.</span></span><br></pre></td></tr></table></figure>
+<p>Python 目前在第三方套件支援 PCAP 的 Parser 算是少的，只有一個還不錯用的 <a href="https://code.google.com/p/dpkt/" target="_blank" rel="external">dpkt</a> 函式庫，但是看上去好像沒在維護了？</p>
+
+        
+            
+        
+    </div>
+    <div class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/Python/">Python</a> <a class="tag tag--primary tag--small t-link" href="/tags/Ryu/">Ryu</a> <a class="tag tag--primary tag--small t-link" href="/tags/pcap/">pcap</a>
+
+            </div>
+        
+        <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2015/02/18/2015-02-18-An-install-script-and-guide-for-Ryu/"  data-tooltip="An install script and guide for Ryu">
+                
+                    <i class="fa fa-angle-left"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2014/12/27/2014-12-27-snort-rules-generator/" data-tooltip="Snort Rules Generator">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://linton.tw/2015/01/26/2015-01-26-saving-captured-packets-in-ryu-controller/">
+                <i class="fa fa-google-plus"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://linton.tw/2015/01/26/2015-01-26-saving-captured-packets-in-ryu-controller/">
+                <i class="fa fa-facebook-official"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://linton.tw/2015/01/26/2015-01-26-saving-captured-packets-in-ryu-controller/">
+                <i class="fa fa-twitter"></i>
+            </a>
+        </li>
+        
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                    <i class="fa fa-comment-o"></i>
+                </a>
+            </li>
+        
+    </ul>
+</div>
+
+
+        
+            <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2015 John Lin. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div class="post-bottom-bar">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2015/02/18/2015-02-18-An-install-script-and-guide-for-Ryu/"  data-tooltip="An install script and guide for Ryu">
+                
+                    <i class="fa fa-angle-left"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2014/12/27/2014-12-27-snort-rules-generator/" data-tooltip="Snort Rules Generator">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://linton.tw/2015/01/26/2015-01-26-saving-captured-packets-in-ryu-controller/">
+                <i class="fa fa-google-plus"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://linton.tw/2015/01/26/2015-01-26-saving-captured-packets-in-ryu-controller/">
+                <i class="fa fa-facebook-official"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://linton.tw/2015/01/26/2015-01-26-saving-captured-packets-in-ryu-controller/">
+                <i class="fa fa-twitter"></i>
+            </a>
+        </li>
+        
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                    <i class="fa fa-comment-o"></i>
+                </a>
+            </li>
+        
+    </ul>
+</div>
+
+
+                </div>
+            
+        </div>
+        <div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-remove"></i>
+        </div>
+        
+            <img id="about-card-picture" src="http://www.gravatar.com/avatar/98b5759510e487ade4145247bc856366?s=110"/>
+        
+            <h4 id="about-card-name">John Lin</h4>
+        
+            <h5 id="about-card-bio">Graduate student majoring in Communications Engineering at National Tsing Hua University (NTHU). My current research interests include the SDN/OpenFlow and network security with dynamic malware analysis. I am also interested in open source projects especially using Python and Node.js!</h5>
+        
+        
+            <h5 id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                Graduate student
+            </h5>
+        
+        
+            <h5 id="about-card-location">
+                <i class="fa fa-map-marker"></i>
+                <br/>
+                Taipei, Taiwan
+            </h5>
+        
+    </div>
+</div>
+        <div id="cover" style="background-image:url('/assets/images/cover.png');"></div>
+    </body>
+    <!--SCRIPTS-->
+<script src="/assets/js/script.min.js" type="text/javascript"></script>
+<!--SCRIPTS END-->
+
+    <script type="text/javascript">
+        var disqus_shortname = 'lintontw';
+        (function() {
+            var dsq = document.createElement('script');
+            dsq.type = 'text/javascript';
+            dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+
+
+</html>

@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html>
+    
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="John&#39;s Lin Blog">
+    <title>協助編譯 Java Source Code 的圖形化界面 - John&#39;s Lin Blog</title>
+    <meta name="author" content="John Lin">
+    <meta name="description" content="John&#39;s Lin Blog">
+    <link rel="icon" href="/assets/images/favicon.ico">
+    
+        <link rel="alternative" type="application/atom+xml" title="RSS" href="atom.xml">
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style.min.css" type="text/css">
+    <!--STYLES END-->
+    
+    <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-47712773-1']);
+        _gaq.push(['_trackPageview']);
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+
+</head>
+
+    <body>
+        <div id="blog">
+            <header id="header">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars "></i>
+    <h1 class="header-title">
+        <a class="header-title-link" href="http://linton.tw">John&#39;s Lin Blog</a>
+    </h1>
+    
+        <a class="header-picture-link" href="/#about">
+            <img class="header-picture" src="http://www.gravatar.com/avatar/98b5759510e487ade4145247bc856366?s=90"/>
+        </a>
+    
+</header>
+            <nav id="sidebar">
+    
+        <div class="sidebar-profile">
+            <a href="/#about">
+                
+                    <img class="sidebar-profile-picture" src="http://www.gravatar.com/avatar/98b5759510e487ade4145247bc856366?s=90"/>
+                
+            </a>
+            <span class="sidebar-profile-name hide-md">John Lin</span>
+        </div>
+    
+    
+        <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+                        <span class="sidebar-button-desc hide-md">Home</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/all-categories">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+                        <span class="sidebar-button-desc hide-md">Categories</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/all-tags">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+                        <span class="sidebar-button-desc hide-md">Tags</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/all-archives">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+                        <span class="sidebar-button-desc hide-md">Archives</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/#about">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+                        <span class="sidebar-button-desc hide-md">About me</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://m103.nthu.edu.tw/~s103064502/" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-file-text"></i>
+                        <span class="sidebar-button-desc hide-md">Résumé</span>
+                    </a>
+                </li>
+            
+        </ul>
+    
+        <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="https://github.com/John-Lin/" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+                        <span class="sidebar-button-desc hide-md">GitHub</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="https://twitter.com/Linton_tw" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-twitter"></i>
+                        <span class="sidebar-button-desc hide-md">Twitter</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="mailto:// linton.tw@gmail.com" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-envelope-o"></i>
+                        <span class="sidebar-button-desc hide-md">Mail</span>
+                    </a>
+                </li>
+            
+        </ul>
+    
+        <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/atom.xml">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+                        <span class="sidebar-button-desc hide-md">RSS</span>
+                    </a>
+                </li>
+            
+        </ul>
+    
+</nav>
+            <div id="main">
+                
+<article class="post" itemscope itemType="http://schema.org/BlogPosting">
+    
+        <div class="post-header main-content-wrap">
+    
+        <h1 class="post-title" itemprop="headline">協助編譯 Java Source Code 的圖形化界面</h1>
+    
+    <div class="post-meta">
+    <time  itemprop="datePublished" content="Sun Oct 13 2013 17:27:00 GMT+0800">
+        Oct 13, 2013
+    </time>
+    
+</div>
+</div>
+    
+    <div class="post-content markdown main-content-wrap" itemprop="articleBody">
+        <h3 id="緣起">緣起</h3><hr>
+<p>最近旁聽一門 <strong>物件導向程式設計</strong> 課程的時候，是用 Java 授課而老師採用的 <strong><a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html" target="_blank" rel="external">Java Development Kit</a></strong> 是 <strong>Portable JDK</strong> (可攜帶版本的 JDK )，其好處是只要將 Portable JDK 裝進隨身碟就可以到處編譯與執行 Java，不需要在電腦上安裝 Java 與設定環境變數。</p>
+<p>比較特別的是老師搭配使用的 IDE 不是常見的 <a href="http://www.eclipse.org/downloads/" target="_blank" rel="external">Eclipse</a>，而是 <a href="http://notepad-plus-plus.org/" target="_blank" rel="external">Notepad++</a> Editor ，這個編輯器提供掛載 Java 編譯器和 Java 虛擬機器可以協助編譯成Byte Code和執行。</p>
+<p>這時候喜歡用 <a href="http://www.sublimetext.com/2" target="_blank" rel="external">Sublime Text2</a> 的我，理所當然的就開始去找 Sublime Text2 掛載 <strong>Portable JDK</strong> 的方法，但是一無所獲…</p>
+<p>最後沒找到的解決方案，當然就是進終端機去編譯與執行程式…</p>
+<p>每當寫完程式後就開始：<br>    <code>$ javac HelloWorld.java</code><br>    <code>$ java HelloWorld</code></p>
+<p>每次都會忘記 <code>$ java HelloWorld</code> 不需要副檔名，而 <code>$ javac HelloWorld.java</code> 需要副檔名，基於 <strong>科技史中來自於惰性</strong> 索性就用 <code>Python</code> 搭配 <code>Tkinter GUI Tookit</code> 寫了這個程式。</p>
+<h3 id="Javac_Assistant簡介">Javac Assistant簡介</h3><hr>
+<h4 id="Javac_Assistant_界面：">Javac Assistant 界面：</h4><p><img src="http://user-image.logdown.io/user/3997/blog/4047/post/147029/NCEn0l4tRoqeugoO6VRw_INTRO.png" alt="INTRO.png"></p>
+<a id="more"></a>
+<h4 id="Javac_Assistant_提供的功能:">Javac Assistant 提供的功能:</h4><ul>
+<li><strong>熱鍵</strong> (Hot Key) 支援所有Menu Bar上的功能 </li>
+<li>協助 <strong>編譯</strong> (*.java) Source Code <code>Hot Key = F5</code></li>
+<li>協助 <strong>執行</strong> (*.class) Byte Code <code>Hot Key = F6</code></li>
+<li>可供選擇使用內建的 <strong>JDK 安裝版</strong>，或是使用 <strong>Portable JDK 攜帶版</strong> 來進行編譯與執行</li>
+<li>具備清除 <strong>終端機</strong> 或 <strong>CMD</strong> 畫面的按鈕</li>
+<li>以 <strong>開啓舊檔</strong> <code>Hot Key = Ctrl+O</code> 選擇欲編譯的Java Source Code，或是選擇使用輸入檔名方式</li>
+<li>回報編譯過程所耗費的時間</li>
+<li>整理散亂的 Source Code 進去同一個資料夾 <code>Hot Key = Ctrl+P</code></li>
+<li>一鍵清除所有Byte Code <code>Hot Key = Ctrl+L</code></li>
+</ul>
+<h4 id="支援的作業系統:">支援的作業系統:</h4><ul>
+<li>Windows</li>
+<li>Mac OSX</li>
+<li>Linux</li>
+</ul>
+<h4 id="功能選項的螢幕快拍：">功能選項的螢幕快拍：</h4><p><img src="http://user-image.logdown.io/user/3997/blog/4047/post/147029/Vifys7buQ9qFdf27m07c_OPEN.png" alt="OPEN.png"></p>
+<p><img src="http://user-image.logdown.io/user/3997/blog/4047/post/147029/n1nUElqqQRSileODQBZV_run.png" alt="run.png"></p>
+<p><img src="http://user-image.logdown.io/user/3997/blog/4047/post/147029/ySooMwtfSFm1PuEkGQhm_TOOL.png" alt="TOOL.png"></p>
+<p><img src="http://user-image.logdown.io/user/3997/blog/4047/post/147029/213lfDPGQP2MI9UfglfA_TIME.png" alt="TIME.png"></p>
+<p><strong>我將程式碼放在我的 <a href="https://github.com/John-Lin/Javac-Assistant" target="_blank" rel="external">GitHub</a> 上有興趣的人可以前往參考！</strong></p>
+<p>Javac Assistant 已經用 PyInstaller 打包成執行檔，方便沒有 Python 直譯器的 Windows 使用者們使用 :<br><strong>載點 : <a href="https://mega.co.nz/#!1REwDb4D!U0Q8DSF1l0W6zH6N67XpYWZZ2HwPkBbmydDl8JkkoB8" target="_blank" rel="external">Javac Assistant.exe</a></strong>   <em>Updated at 2013/10/16</em></p>
+
+        
+            
+        
+    </div>
+    <div class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/Python/">Python</a> <a class="tag tag--primary tag--small t-link" href="/tags/Tkinter/">Tkinter</a>
+
+            </div>
+        
+        <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2013/10/18/2013-10-18-scapy-network-packet-analysis-tool/"  data-tooltip="Scapy 網路封包分析工具">
+                
+                    <i class="fa fa-angle-left"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2013/10/08/2013-10-08-introduction-to-working-with-pyinstaller20/" data-tooltip="PyInstaller 2.0 使用簡介">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://linton.tw/2013/10/13/2013-10-13-help-to-compile-java-source-code-graphical-interface/">
+                <i class="fa fa-google-plus"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://linton.tw/2013/10/13/2013-10-13-help-to-compile-java-source-code-graphical-interface/">
+                <i class="fa fa-facebook-official"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://linton.tw/2013/10/13/2013-10-13-help-to-compile-java-source-code-graphical-interface/">
+                <i class="fa fa-twitter"></i>
+            </a>
+        </li>
+        
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                    <i class="fa fa-comment-o"></i>
+                </a>
+            </li>
+        
+    </ul>
+</div>
+
+
+        
+            <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2015 John Lin. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div class="post-bottom-bar">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2013/10/18/2013-10-18-scapy-network-packet-analysis-tool/"  data-tooltip="Scapy 網路封包分析工具">
+                
+                    <i class="fa fa-angle-left"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2013/10/08/2013-10-08-introduction-to-working-with-pyinstaller20/" data-tooltip="PyInstaller 2.0 使用簡介">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://linton.tw/2013/10/13/2013-10-13-help-to-compile-java-source-code-graphical-interface/">
+                <i class="fa fa-google-plus"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://linton.tw/2013/10/13/2013-10-13-help-to-compile-java-source-code-graphical-interface/">
+                <i class="fa fa-facebook-official"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://linton.tw/2013/10/13/2013-10-13-help-to-compile-java-source-code-graphical-interface/">
+                <i class="fa fa-twitter"></i>
+            </a>
+        </li>
+        
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                    <i class="fa fa-comment-o"></i>
+                </a>
+            </li>
+        
+    </ul>
+</div>
+
+
+                </div>
+            
+        </div>
+        <div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-remove"></i>
+        </div>
+        
+            <img id="about-card-picture" src="http://www.gravatar.com/avatar/98b5759510e487ade4145247bc856366?s=110"/>
+        
+            <h4 id="about-card-name">John Lin</h4>
+        
+            <h5 id="about-card-bio">Graduate student majoring in Communications Engineering at National Tsing Hua University (NTHU). My current research interests include the SDN/OpenFlow and network security with dynamic malware analysis. I am also interested in open source projects especially using Python and Node.js!</h5>
+        
+        
+            <h5 id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                Graduate student
+            </h5>
+        
+        
+            <h5 id="about-card-location">
+                <i class="fa fa-map-marker"></i>
+                <br/>
+                Taipei, Taiwan
+            </h5>
+        
+    </div>
+</div>
+        <div id="cover" style="background-image:url('/assets/images/cover.png');"></div>
+    </body>
+    <!--SCRIPTS-->
+<script src="/assets/js/script.min.js" type="text/javascript"></script>
+<!--SCRIPTS END-->
+
+    <script type="text/javascript">
+        var disqus_shortname = 'lintontw';
+        (function() {
+            var dsq = document.createElement('script');
+            dsq.type = 'text/javascript';
+            dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+
+
+</html>

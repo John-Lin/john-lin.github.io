@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html>
+    
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="John&#39;s Lin Blog">
+    <title>在 Mac OS X Mavericks 上安裝 Aten UC-232A USB to Serial 驅動程式 - John&#39;s Lin Blog</title>
+    <meta name="author" content="John Lin">
+    <meta name="description" content="John&#39;s Lin Blog">
+    <link rel="icon" href="/assets/images/favicon.ico">
+    
+        <link rel="alternative" type="application/atom+xml" title="RSS" href="atom.xml">
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style.min.css" type="text/css">
+    <!--STYLES END-->
+    
+    <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-47712773-1']);
+        _gaq.push(['_trackPageview']);
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+
+</head>
+
+    <body>
+        <div id="blog">
+            <header id="header">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars "></i>
+    <h1 class="header-title">
+        <a class="header-title-link" href="http://linton.tw">John&#39;s Lin Blog</a>
+    </h1>
+    
+        <a class="header-picture-link" href="/#about">
+            <img class="header-picture" src="http://www.gravatar.com/avatar/98b5759510e487ade4145247bc856366?s=90"/>
+        </a>
+    
+</header>
+            <nav id="sidebar">
+    
+        <div class="sidebar-profile">
+            <a href="/#about">
+                
+                    <img class="sidebar-profile-picture" src="http://www.gravatar.com/avatar/98b5759510e487ade4145247bc856366?s=90"/>
+                
+            </a>
+            <span class="sidebar-profile-name hide-md">John Lin</span>
+        </div>
+    
+    
+        <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+                        <span class="sidebar-button-desc hide-md">Home</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/all-categories">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+                        <span class="sidebar-button-desc hide-md">Categories</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/all-tags">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+                        <span class="sidebar-button-desc hide-md">Tags</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/all-archives">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+                        <span class="sidebar-button-desc hide-md">Archives</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/#about">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+                        <span class="sidebar-button-desc hide-md">About me</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://m103.nthu.edu.tw/~s103064502/" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-file-text"></i>
+                        <span class="sidebar-button-desc hide-md">Résumé</span>
+                    </a>
+                </li>
+            
+        </ul>
+    
+        <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="https://github.com/John-Lin/" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+                        <span class="sidebar-button-desc hide-md">GitHub</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="https://twitter.com/Linton_tw" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-twitter"></i>
+                        <span class="sidebar-button-desc hide-md">Twitter</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="mailto:// linton.tw@gmail.com" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-envelope-o"></i>
+                        <span class="sidebar-button-desc hide-md">Mail</span>
+                    </a>
+                </li>
+            
+        </ul>
+    
+        <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/atom.xml">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+                        <span class="sidebar-button-desc hide-md">RSS</span>
+                    </a>
+                </li>
+            
+        </ul>
+    
+</nav>
+            <div id="main">
+                
+<article class="post" itemscope itemType="http://schema.org/BlogPosting">
+    
+        <div class="post-header main-content-wrap">
+    
+        <h1 class="post-title" itemprop="headline">在 Mac OS X Mavericks 上安裝 Aten UC-232A USB to Serial 驅動程式</h1>
+    
+    <div class="post-meta">
+    <time  itemprop="datePublished" content="Mon Jul 28 2014 17:11:00 GMT+0800">
+        Jul 28, 2014
+    </time>
+    
+</div>
+</div>
+    
+    <div class="post-content markdown main-content-wrap" itemprop="articleBody">
+        <h3 id="前言">前言</h3><hr>
+<p>今天在摸索 Centec v350 時候，想要在 Mac 上利用 <strong>screen</strong> 應用程式，連線 Serial Port 發現一件小問題。</p>
+<p>原本在 Mac 上使用 RS-232 轉 Serial 的裝置應該是一件很輕鬆的的事情，找到本文的主角【Aten UC-232A】對應的驅動程式（<a href="http://www.prolific.com.tw/US/ShowProduct.aspx?p_id=229&amp;pcid=41" target="_blank" rel="external">官方下載點</a>）利用 <strong>screen</strong> 程式指定控制終端設備<code>/dev/tty.usbserial</code> 與 <code>Baud rate</code> 就能利用 COM port 輕鬆連入 Switch 但是，事情似乎不是你我想的那麼簡單…</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ screen /dev/tty<span class="class">.usbserial</span> <span class="number">128000</span></span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<p>你會發現，當你裝好驅動程式之後，進去 /dev 卻發現找不到 tty.usbserial 檔案，這樣一來就沒辦法用了…</p>
+<h3 id="發現問題">發現問題</h3><hr>
+<p>原來是 Prolific 官方的 Driver 似乎不斷的更新，而 Aten UC-232A 就是使用 Prolific 的晶片，神奇的是 Vendor ID 和 Product ID 卻不在 Prolific 的 Driver 裡面（猜測是軟體更新太快，硬體太舊變成孤兒了），這會讓你沒辦法正常使用，即使你裝好了 Driver 接上 Aten UC-232A 的 USB to Serial 裝置</p>
+<h3 id="解決方法">解決方法</h3><hr>
+<h4 id="檢查裝置的資訊">檢查裝置的資訊</h4><p><img src="http://user-image.logdown.io/user/3997/blog/4047/post/211786/IXZiuqHQB6NeUs5Jb5Xy_%E8%9E%A2%E5%B9%95%E6%88%AA%E5%9C%96%202014-07-29%2011.11.16.png" alt="螢幕截圖 2014-07-29 11.11.16.png"></p>
+<p>接上 UC-232A 後， 打開 Mac 裡的【系統資訊】並檢查裝置的 Vendor ID 和 Product ID 在我的裝置底下看到的是</p>
+<p>(Product ID: 0x2008 and Vendor ID: 0x0557)</p>
+<p>請注意，我們需要把這個換成從 <strong>十六進位</strong> 的數值換成 <strong>十進位</strong> 的並且記下來</p>
+<p>(Product ID: 8200 and Vendor ID: 1367)</p>
+<h4 id="下載安裝驅動程式">下載安裝驅動程式</h4><p>從 <a href="http://www.prolific.com.tw/US/ShowProduct.aspx?p_id=229&amp;pcid=41" target="_blank" rel="external">Prolific 的官方下載點</a> 下載檔案名稱 md_PL2303_MacOSX_10_6up_v1_5_1.zip 解壓縮之後會出現 PL2303_MacOSX_v1.5.1.pkg 安裝後，需要重新啟動電腦。</p>
+<h4 id="修正_UC-232A_Driver_的_plist_檔案">修正 UC-232A Driver 的 plist 檔案</h4><p>修改一下 plist 檔案需要管理者權限</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo vim <span class="regexp">/System/</span>Library<span class="regexp">/Extensions/</span>ProlificUsbSerial.kext<span class="regexp">/Contents/I</span>nfo.plist</span><br></pre></td></tr></table></figure>
+<p>可以利用搜尋找到 <code>&lt;key&gt;IOKitPersonalities&lt;/key&gt;</code> 這行下面大概會是像以下這樣</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">key</span>&gt;</span>067B_2303<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">dict</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>CFBundleIdentifier<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">string</span>&gt;</span>com.prolific.driver.PL2303<span class="tag">&lt;/<span class="title">string</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>IOClass<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">string</span>&gt;</span>com_prolific_driver_PL2303<span class="tag">&lt;/<span class="title">string</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>IOProviderClass<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">string</span>&gt;</span>IOUSBInterface<span class="tag">&lt;/<span class="title">string</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>bConfigurationValue<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">integer</span>&gt;</span>1<span class="tag">&lt;/<span class="title">integer</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>bInterfaceNumber<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">integer</span>&gt;</span>0<span class="tag">&lt;/<span class="title">integer</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>idProduct<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">integer</span>&gt;</span>8963<span class="tag">&lt;/<span class="title">integer</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>idVendor<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">integer</span>&gt;</span>1659<span class="tag">&lt;/<span class="title">integer</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">dict</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>姑且先稱上面的裝置設定檔叫做 <strong>一個區塊</strong> 吧！你大概可以看到包含我剛剛上面所貼的總共有 <strong>兩個區塊</strong>，</p>
+<p>我們需要複製 <strong>其中一個區塊</strong> 作為參考的範例，並且把剛剛第一步所看到的 <strong>Vendor ID</strong> 和 <strong>Product ID</strong> 修改複製後的範例，後貼在第二個區塊的後面，實際做法只需要更改三個地方就是 <strong>idProduct</strong> 和 <strong>idVendor</strong> 把剛剛記下來的 <strong>Vendor ID</strong> 和 <strong>Product ID</strong> 的十進位值填入，另外就是 \<key> 標簽裡面用 0557_2008 替代</key></p>
+<p>完成後大概如下面的樣子，你會擁有三個區塊</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">key</span>&gt;</span>067B_2303<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">dict</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>CFBundleIdentifier<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">string</span>&gt;</span>com.prolific.driver.PL2303<span class="tag">&lt;/<span class="title">string</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>IOClass<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">string</span>&gt;</span>com_prolific_driver_PL2303<span class="tag">&lt;/<span class="title">string</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>IOProviderClass<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">string</span>&gt;</span>IOUSBInterface<span class="tag">&lt;/<span class="title">string</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>bConfigurationValue<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">integer</span>&gt;</span>1<span class="tag">&lt;/<span class="title">integer</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>bInterfaceNumber<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">integer</span>&gt;</span>0<span class="tag">&lt;/<span class="title">integer</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>idProduct<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">integer</span>&gt;</span>8963<span class="tag">&lt;/<span class="title">integer</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>idVendor<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">integer</span>&gt;</span>1659<span class="tag">&lt;/<span class="title">integer</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">dict</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">key</span>&gt;</span>067B_2304<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">dict</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>CFBundleIdentifier<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">string</span>&gt;</span>com.prolific.driver.PL2303<span class="tag">&lt;/<span class="title">string</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>IOClass<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">string</span>&gt;</span>com_prolific_driver_PL2303<span class="tag">&lt;/<span class="title">string</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>IOProviderClass<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">string</span>&gt;</span>IOUSBInterface<span class="tag">&lt;/<span class="title">string</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>bConfigurationValue<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">integer</span>&gt;</span>1<span class="tag">&lt;/<span class="title">integer</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>bInterfaceNumber<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">integer</span>&gt;</span>0<span class="tag">&lt;/<span class="title">integer</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>idProduct<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">integer</span>&gt;</span>8964<span class="tag">&lt;/<span class="title">integer</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>idVendor<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">integer</span>&gt;</span>1659<span class="tag">&lt;/<span class="title">integer</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">dict</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">key</span>&gt;</span>0557_2008<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">dict</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>CFBundleIdentifier<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">string</span>&gt;</span>com.prolific.driver.PL2303<span class="tag">&lt;/<span class="title">string</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>IOClass<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">string</span>&gt;</span>com_prolific_driver_PL2303<span class="tag">&lt;/<span class="title">string</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>IOProviderClass<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">string</span>&gt;</span>IOUSBInterface<span class="tag">&lt;/<span class="title">string</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>bConfigurationValue<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">integer</span>&gt;</span>1<span class="tag">&lt;/<span class="title">integer</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>bInterfaceNumber<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">integer</span>&gt;</span>0<span class="tag">&lt;/<span class="title">integer</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>idProduct<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">integer</span>&gt;</span>8200<span class="tag">&lt;/<span class="title">integer</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">key</span>&gt;</span>idVendor<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">integer</span>&gt;</span>1367<span class="tag">&lt;/<span class="title">integer</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;/<span class="title">dict</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h4 id="測試_Driver">測試 Driver</h4><p>執行下面的指令，你應該不會得到錯誤訊息。一旦成功後，你應該可以看到並且可以使用 <code>/dev/tty.usbserial</code></p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo kextload <span class="regexp">/System/</span>Library<span class="regexp">/Extensions/</span>ProlificUsbSerial.kext</span><br></pre></td></tr></table></figure>
+<h4 id="測試_Driver_的自動載入">測試 Driver 的自動載入</h4><p>重啟系統，接上 UC-232A 應該會自動載入，如果沒有順利的自動載入可以執行以下指令</p>
+<figure class="highlight delphi"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo touch /System/<span class="keyword">Library</span>/Extensions</span><br></pre></td></tr></table></figure>
+<p>再回到上一個步驟，【測試 Driver】試試應該可以成功。</p>
+<h4 id="參考資料">參考資料</h4><ul>
+<li><a href="http://blog.unfed.org/2013/10/using-aten-uc-232a-usb-to-serial.html" target="_blank" rel="external">Using Aten UC-232A USB to Serial converter on Mac OS X Mavericks</a></li>
+</ul>
+
+        
+            
+        
+    </div>
+    <div class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/Aten-UC-232A/">Aten UC-232A</a> <a class="tag tag--primary tag--small t-link" href="/tags/Mac-OS-X-Mavericks/">Mac OS X Mavericks</a> <a class="tag tag--primary tag--small t-link" href="/tags/USB-to-Serial/">USB to Serial</a> <a class="tag tag--primary tag--small t-link" href="/tags/driver/">driver</a>
+
+            </div>
+        
+        <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2014/08/08/2014-08-08-My-first-time-using-hexo/"  data-tooltip="My first time using hexo">
+                
+                    <i class="fa fa-angle-left"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2014/07/06/2014-07-06-beijing-college-student-it-camp-university-of-posts-and-telecommunications/" data-tooltip=" 2014年京台大學生IT交流營【北京郵電大學】">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://linton.tw/2014/07/28/2014-07-28-in-the-mac-os-x-install-aten-mavericks-uc-232a-usb-to-serial-driver/">
+                <i class="fa fa-google-plus"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://linton.tw/2014/07/28/2014-07-28-in-the-mac-os-x-install-aten-mavericks-uc-232a-usb-to-serial-driver/">
+                <i class="fa fa-facebook-official"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://linton.tw/2014/07/28/2014-07-28-in-the-mac-os-x-install-aten-mavericks-uc-232a-usb-to-serial-driver/">
+                <i class="fa fa-twitter"></i>
+            </a>
+        </li>
+        
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                    <i class="fa fa-comment-o"></i>
+                </a>
+            </li>
+        
+    </ul>
+</div>
+
+
+        
+            <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2015 John Lin. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div class="post-bottom-bar">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2014/08/08/2014-08-08-My-first-time-using-hexo/"  data-tooltip="My first time using hexo">
+                
+                    <i class="fa fa-angle-left"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2014/07/06/2014-07-06-beijing-college-student-it-camp-university-of-posts-and-telecommunications/" data-tooltip=" 2014年京台大學生IT交流營【北京郵電大學】">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://linton.tw/2014/07/28/2014-07-28-in-the-mac-os-x-install-aten-mavericks-uc-232a-usb-to-serial-driver/">
+                <i class="fa fa-google-plus"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://linton.tw/2014/07/28/2014-07-28-in-the-mac-os-x-install-aten-mavericks-uc-232a-usb-to-serial-driver/">
+                <i class="fa fa-facebook-official"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://linton.tw/2014/07/28/2014-07-28-in-the-mac-os-x-install-aten-mavericks-uc-232a-usb-to-serial-driver/">
+                <i class="fa fa-twitter"></i>
+            </a>
+        </li>
+        
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                    <i class="fa fa-comment-o"></i>
+                </a>
+            </li>
+        
+    </ul>
+</div>
+
+
+                </div>
+            
+        </div>
+        <div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-remove"></i>
+        </div>
+        
+            <img id="about-card-picture" src="http://www.gravatar.com/avatar/98b5759510e487ade4145247bc856366?s=110"/>
+        
+            <h4 id="about-card-name">John Lin</h4>
+        
+            <h5 id="about-card-bio">Graduate student majoring in Communications Engineering at National Tsing Hua University (NTHU). My current research interests include the SDN/OpenFlow and network security with dynamic malware analysis. I am also interested in open source projects especially using Python and Node.js!</h5>
+        
+        
+            <h5 id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                Graduate student
+            </h5>
+        
+        
+            <h5 id="about-card-location">
+                <i class="fa fa-map-marker"></i>
+                <br/>
+                Taipei, Taiwan
+            </h5>
+        
+    </div>
+</div>
+        <div id="cover" style="background-image:url('/assets/images/cover.png');"></div>
+    </body>
+    <!--SCRIPTS-->
+<script src="/assets/js/script.min.js" type="text/javascript"></script>
+<!--SCRIPTS END-->
+
+    <script type="text/javascript">
+        var disqus_shortname = 'lintontw';
+        (function() {
+            var dsq = document.createElement('script');
+            dsq.type = 'text/javascript';
+            dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+
+
+</html>

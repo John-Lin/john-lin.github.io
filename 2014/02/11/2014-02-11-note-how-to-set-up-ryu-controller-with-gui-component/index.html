@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html>
+    
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="John&#39;s Lin Blog">
+    <title>[筆記] How to set up Ryu controller with GUI component? - John&#39;s Lin Blog</title>
+    <meta name="author" content="John Lin">
+    <meta name="description" content="John&#39;s Lin Blog">
+    <link rel="icon" href="/assets/images/favicon.ico">
+    
+        <link rel="alternative" type="application/atom+xml" title="RSS" href="atom.xml">
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style.min.css" type="text/css">
+    <!--STYLES END-->
+    
+    <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-47712773-1']);
+        _gaq.push(['_trackPageview']);
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+
+</head>
+
+    <body>
+        <div id="blog">
+            <header id="header">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars "></i>
+    <h1 class="header-title">
+        <a class="header-title-link" href="http://linton.tw">John&#39;s Lin Blog</a>
+    </h1>
+    
+        <a class="header-picture-link" href="/#about">
+            <img class="header-picture" src="http://www.gravatar.com/avatar/98b5759510e487ade4145247bc856366?s=90"/>
+        </a>
+    
+</header>
+            <nav id="sidebar">
+    
+        <div class="sidebar-profile">
+            <a href="/#about">
+                
+                    <img class="sidebar-profile-picture" src="http://www.gravatar.com/avatar/98b5759510e487ade4145247bc856366?s=90"/>
+                
+            </a>
+            <span class="sidebar-profile-name hide-md">John Lin</span>
+        </div>
+    
+    
+        <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+                        <span class="sidebar-button-desc hide-md">Home</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/all-categories">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+                        <span class="sidebar-button-desc hide-md">Categories</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/all-tags">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+                        <span class="sidebar-button-desc hide-md">Tags</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/all-archives">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+                        <span class="sidebar-button-desc hide-md">Archives</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/#about">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+                        <span class="sidebar-button-desc hide-md">About me</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://m103.nthu.edu.tw/~s103064502/" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-file-text"></i>
+                        <span class="sidebar-button-desc hide-md">Résumé</span>
+                    </a>
+                </li>
+            
+        </ul>
+    
+        <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="https://github.com/John-Lin/" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+                        <span class="sidebar-button-desc hide-md">GitHub</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="https://twitter.com/Linton_tw" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-twitter"></i>
+                        <span class="sidebar-button-desc hide-md">Twitter</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="mailto:// linton.tw@gmail.com" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-envelope-o"></i>
+                        <span class="sidebar-button-desc hide-md">Mail</span>
+                    </a>
+                </li>
+            
+        </ul>
+    
+        <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/atom.xml">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+                        <span class="sidebar-button-desc hide-md">RSS</span>
+                    </a>
+                </li>
+            
+        </ul>
+    
+</nav>
+            <div id="main">
+                
+<article class="post" itemscope itemType="http://schema.org/BlogPosting">
+    
+        <div class="post-header main-content-wrap">
+    
+        <h1 class="post-title" itemprop="headline">[筆記] How to set up Ryu controller with GUI component?</h1>
+    
+    <div class="post-meta">
+    <time  itemprop="datePublished" content="Tue Feb 11 2014 00:00:00 GMT+0800">
+        Feb 11, 2014
+    </time>
+    
+</div>
+</div>
+    
+    <div class="post-content markdown main-content-wrap" itemprop="articleBody">
+        <p>下圖是利用 Ryu 和 mininet 設計的一個簡單網路拓璞（三個switch, 四個host），並且用 Ryu with GUI 顯示在 Web 介面上。<br><img src="http://user-image.logdown.io/user/3997/blog/4047/post/178417/lcREdZ7SyK472OaDcDWP_Ryu_with_GUI.png" alt="Ryu_with_GUI.png"></p>
+<p>除了 <a href="http://osrg.github.io/ryu/" target="_blank" rel="external">Ryu</a> 之外，目前看過幾個比較熱門的 SDN Framwwork<br>例如: <a href="http://www.opendaylight.org/" target="_blank" rel="external">OpenDaylight</a>, <a href="http://www.projectfloodlight.org/floodlight/" target="_blank" rel="external">Floodlight</a>。上面三種 SDN Framwwork 都具有各自的 Web GUI 介面，目前看起來 Ryu 較為陽春（如上圖，可以發現 Ryu with GUI 並沒有畫出 host 的圖形），不過我相信很快就可以追上!</p>
+<a id="more"></a>
+<p>目前 <a href="https://github.com/yamada-h/ryu/tree/gui-patch-v3-rebase" target="_blank" rel="external">Ryu with GUI</a> 是由 <a href="https://github.com/yamada-h" target="_blank" rel="external">yamada-h</a>從 <a href="https://github.com/ntts-clo/ryu" target="_blank" rel="external">ntts-clo/ryu</a> 專案 fork 出來做的一個 patch。稍微追了一下發現 <a href="https://github.com/ntts-clo/ryu" target="_blank" rel="external">ntts-clo/ryu</a> 是從原官方專案 <a href="https://github.com/osrg/ryu" target="_blank" rel="external">osrg/ryu</a> fork 出來的。</p>
+<h3 id="Architecture">Architecture</h3><hr>
+<p>Ryu with GUI 的架構圖如下圖：<br><img class="center" src="http://user-image.logdown.io/user/3997/blog/4047/post/178417/Vl8qvnPpSCWrdhwtlH8U_architecture.png" alt="architecture.png"></p>
+<h3 id="Requirements">Requirements</h3><hr>
+<p>Ryu with GUI 需要依賴以下幾個 python 套件，請先用 <code>pip install</code> 安裝好:</p>
+<ul>
+<li>Ryu (<a href="http://blog.linton.tw/posts/2014/01/11/install-ryu-sdn-framework" target="_blank" rel="external">Install Ryu SDN Framework</a>)</li>
+<li>Flask (Python 上一個非常知名的輕量化 Web Famework)</li>
+<li>gevent-websocket (在Web Browser 與 GUI Server做聯繫的套件)</li>
+</ul>
+<p>注意:在安裝 <strong>gevent-websocket</strong> 之前，需要先安裝 <strong>python-dev</strong> 可以使用以下指令進行安裝:</p>
+<figure class="highlight q"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-<span class="built_in">get</span> install python-<span class="built_in">dev</span></span><br></pre></td></tr></table></figure>
+<h3 id="Add_Patch">Add Patch</h3><hr>
+<p>前面有稍微提過，Ryu with GUI 並不包含在官方提供的 source code 裡面，需要再加入一些 patch 好讓 Ryu with GUI 運作。</p>
+<p>由此 <a href="https://github.com/yamada-h/ryu/archive/gui-patch-v3-rebase.zip" target="_blank" rel="external">gui-patch-v3-rebase</a> 下載 ZIP 解壓縮後在路徑 <code>/gui-patch-v3-rebase/ryu/gui</code> 將 gui 整個資料夾複製到原官方 Ryu 專案相同位置的地方(<code>/ryu/ryu/</code>)。接著要到 <code>/ryu/ryu/topology</code> 修改 <code>switches.py</code> 45行-53行的地方註解掉。</p>
+<p><img src="http://user-image.logdown.io/user/3997/blog/4047/post/178417/mQbRUzATS5SxIFVgUr2M_switches.png" alt="switches.png"></p>
+<h3 id="Usage">Usage</h3><hr>
+<ul>
+<li><strong>Running Ryu</strong><br>執行 Ryu with GUI 需要以下幾個應用程式透過 REST API 與 GUI Server 溝通</li>
+</ul>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ryu-manager --verbose --observe-links ryu<span class="class">.topology</span><span class="class">.switches</span> ryu<span class="class">.app</span><span class="class">.rest_topology</span> ryu<span class="class">.app</span><span class="class">.ofctl_rest</span> ryu<span class="class">.app</span><span class="class">.simple_switch</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>Running GUI server</strong></li>
+</ul>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ./ryu/<span class="keyword">gui</span>/controller.<span class="keyword">py</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>Topology GUI on Browser<br>若在同一台電腦上，請用瀏覽器到網址 <a href="http://127.0.0.1:8000" target="_blank" rel="external">http://127.0.0.1:8000</a></li>
+</ul>
+<h3 id="小結">小結</h3><hr>
+<p>設置過程並不困難，稍微注意一下 Add patch 步驟即可，但是感覺網路上能找的資料有一點少，所以做了一些筆記。<br>下次再來寫一篇 Ryu 和 Mininet 的結合使用。</p>
+<h3 id="參考資料">參考資料</h3><hr>
+<ul>
+<li><a href="https://github.com/yamada-h/ryu/wiki/GUI" target="_blank" rel="external">Ryu GUI wiki</a></li>
+<li><a href="http://www.sdnap.com/wp-content/uploads/others/Ryu_and_GUI_installaion_from_king-nanjing_sdnap.pdf" target="_blank" rel="external">文刀分享 之 Ryu GUI 搭建</a></li>
+</ul>
+
+        
+            
+        
+    </div>
+    <div class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/Flask/">Flask</a> <a class="tag tag--primary tag--small t-link" href="/tags/OpenFlow/">OpenFlow</a> <a class="tag tag--primary tag--small t-link" href="/tags/Python/">Python</a> <a class="tag tag--primary tag--small t-link" href="/tags/Ryu-with-GUI/">Ryu with GUI</a> <a class="tag tag--primary tag--small t-link" href="/tags/SDN/">SDN</a>
+
+            </div>
+        
+        <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2014/02/15/2014-02-15-note-install-ryu-36-sdn-framework/"  data-tooltip="[筆記] Install Ryu 3.6 - SDN Framework ">
+                
+                    <i class="fa fa-angle-left"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2014/02/09/2014-02-09-note-ryu-controller-app-dumb-layer-2-switch/" data-tooltip="[筆記] Ryu controller app - Dumb layer 2 switch">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://linton.tw/2014/02/11/2014-02-11-note-how-to-set-up-ryu-controller-with-gui-component/">
+                <i class="fa fa-google-plus"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://linton.tw/2014/02/11/2014-02-11-note-how-to-set-up-ryu-controller-with-gui-component/">
+                <i class="fa fa-facebook-official"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://linton.tw/2014/02/11/2014-02-11-note-how-to-set-up-ryu-controller-with-gui-component/">
+                <i class="fa fa-twitter"></i>
+            </a>
+        </li>
+        
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                    <i class="fa fa-comment-o"></i>
+                </a>
+            </li>
+        
+    </ul>
+</div>
+
+
+        
+            <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2015 John Lin. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div class="post-bottom-bar">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2014/02/15/2014-02-15-note-install-ryu-36-sdn-framework/"  data-tooltip="[筆記] Install Ryu 3.6 - SDN Framework ">
+                
+                    <i class="fa fa-angle-left"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2014/02/09/2014-02-09-note-ryu-controller-app-dumb-layer-2-switch/" data-tooltip="[筆記] Ryu controller app - Dumb layer 2 switch">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://linton.tw/2014/02/11/2014-02-11-note-how-to-set-up-ryu-controller-with-gui-component/">
+                <i class="fa fa-google-plus"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://linton.tw/2014/02/11/2014-02-11-note-how-to-set-up-ryu-controller-with-gui-component/">
+                <i class="fa fa-facebook-official"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://linton.tw/2014/02/11/2014-02-11-note-how-to-set-up-ryu-controller-with-gui-component/">
+                <i class="fa fa-twitter"></i>
+            </a>
+        </li>
+        
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                    <i class="fa fa-comment-o"></i>
+                </a>
+            </li>
+        
+    </ul>
+</div>
+
+
+                </div>
+            
+        </div>
+        <div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-remove"></i>
+        </div>
+        
+            <img id="about-card-picture" src="http://www.gravatar.com/avatar/98b5759510e487ade4145247bc856366?s=110"/>
+        
+            <h4 id="about-card-name">John Lin</h4>
+        
+            <h5 id="about-card-bio">Graduate student majoring in Communications Engineering at National Tsing Hua University (NTHU). My current research interests include the SDN/OpenFlow and network security with dynamic malware analysis. I am also interested in open source projects especially using Python and Node.js!</h5>
+        
+        
+            <h5 id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                Graduate student
+            </h5>
+        
+        
+            <h5 id="about-card-location">
+                <i class="fa fa-map-marker"></i>
+                <br/>
+                Taipei, Taiwan
+            </h5>
+        
+    </div>
+</div>
+        <div id="cover" style="background-image:url('/assets/images/cover.png');"></div>
+    </body>
+    <!--SCRIPTS-->
+<script src="/assets/js/script.min.js" type="text/javascript"></script>
+<!--SCRIPTS END-->
+
+    <script type="text/javascript">
+        var disqus_shortname = 'lintontw';
+        (function() {
+            var dsq = document.createElement('script');
+            dsq.type = 'text/javascript';
+            dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+
+
+</html>
