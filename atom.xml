@@ -161,7 +161,7 @@
 <p>分析網路封包與產生 Snort Rules 解封包重組 Payload 用 <a href="https://code.google.com/p/dpkt/" target="_blank" rel="external">Dpkt</a> 判斷惡意或善意連線需要有一個 Knowledge Base 依靠的是 <a href="https://www.virustotal.com/" target="_blank" rel="external">VirusTotal</a> 所提供的 API 這邊我有去申請 Private 的 API 每分鐘能發 300 個 requests 相較於 Public API 每分鐘 4 個 requests 是天差地遠！</p>
 <p>我想徵招興趣的朋友一起來做專案都在 Github 上！</p>
 <p><a href="https://github.com/John-Lin/malware" target="_blank" rel="external">https://github.com/John-Lin/malware</a></p>
-<p>對此專案有興趣，或想加入一起開發的朋友可以來信 <a href="&#109;&#97;&#105;&#108;&#x74;&#x6f;&#x3a;&#x6c;&#105;&#x6e;&#116;&#x6f;&#x6e;&#x2e;&#x74;&#119;&#x40;&#x67;&#x6d;&#97;&#105;&#x6c;&#x2e;&#99;&#x6f;&#109;">&#x6c;&#105;&#x6e;&#116;&#x6f;&#x6e;&#x2e;&#x74;&#119;&#x40;&#x67;&#x6d;&#97;&#105;&#x6c;&#x2e;&#99;&#x6f;&#109;</a></p>
+<p>對此專案有興趣，或想加入一起開發的朋友可以來信 <a href="&#x6d;&#97;&#105;&#x6c;&#116;&#111;&#x3a;&#108;&#105;&#x6e;&#x74;&#111;&#110;&#46;&#x74;&#119;&#64;&#103;&#x6d;&#x61;&#105;&#x6c;&#46;&#x63;&#x6f;&#x6d;">&#108;&#105;&#x6e;&#x74;&#111;&#110;&#46;&#x74;&#119;&#64;&#103;&#x6d;&#x61;&#105;&#x6c;&#46;&#x63;&#x6f;&#x6d;</a></p>
 <p>目前有幾項功能想要增加：</p>
 <ul>
 <li><p>產生非 HTTP Protocol 的規則 （沒錯！除 UDP 的規則目前尚在開發中， TCP 的 case 我目前只有針對 HTTP Protocol 產生的規則，因為 Windows 防火牆預設都把其他 port 關了，我就錄不到其他 port 的連線！）</p>
@@ -736,7 +736,7 @@
 <figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">linton@linton-virtual-machine ~ $ ryu-manager </span><br><span class="line">loading app ryu<span class="class">.controller</span><span class="class">.ofp_handler</span></span><br><span class="line">instantiating app ryu<span class="class">.controller</span><span class="class">.ofp_handler</span> of OFPHandler</span><br></pre></td></tr></table></figure>
 <h3 id="End…">End…</h3><hr>
 <p>若安裝過程還是有問題，可以寄信給我或是在下面留言與我討論 =)</p>
-<p>十分歡迎有在研究 SDN 的朋友一起討論!!<br>Email Address : <a href="&#x6d;&#x61;&#105;&#108;&#116;&#x6f;&#x3a;&#108;&#105;&#110;&#116;&#x6f;&#110;&#64;&#105;&#x69;&#105;&#x2e;&#x6f;&#x72;&#103;&#x2e;&#x74;&#119;">&#108;&#105;&#110;&#116;&#x6f;&#110;&#64;&#105;&#x69;&#105;&#x2e;&#x6f;&#x72;&#103;&#x2e;&#x74;&#119;</a>  ;  <a href="&#109;&#x61;&#x69;&#x6c;&#x74;&#111;&#58;&#x6c;&#105;&#110;&#116;&#x6f;&#x6e;&#x2e;&#116;&#119;&#64;&#103;&#x6d;&#97;&#x69;&#108;&#46;&#99;&#111;&#x6d;">&#x6c;&#105;&#110;&#116;&#x6f;&#x6e;&#x2e;&#116;&#119;&#64;&#103;&#x6d;&#97;&#x69;&#108;&#46;&#99;&#111;&#x6d;</a></p>
+<p>十分歡迎有在研究 SDN 的朋友一起討論!!<br>Email Address : <a href="&#x6d;&#x61;&#105;&#x6c;&#x74;&#111;&#58;&#x6c;&#x69;&#110;&#116;&#111;&#x6e;&#64;&#x69;&#x69;&#x69;&#x2e;&#x6f;&#x72;&#x67;&#x2e;&#x74;&#119;">&#x6c;&#x69;&#110;&#116;&#111;&#x6e;&#64;&#x69;&#x69;&#x69;&#x2e;&#x6f;&#x72;&#x67;&#x2e;&#x74;&#119;</a>  ;  <a href="&#x6d;&#97;&#105;&#x6c;&#116;&#111;&#58;&#x6c;&#x69;&#110;&#x74;&#x6f;&#x6e;&#x2e;&#116;&#119;&#x40;&#103;&#109;&#97;&#105;&#x6c;&#46;&#99;&#x6f;&#x6d;">&#x6c;&#x69;&#110;&#x74;&#x6f;&#x6e;&#x2e;&#116;&#119;&#x40;&#103;&#109;&#97;&#105;&#x6c;&#46;&#99;&#x6f;&#x6d;</a></p>
 ]]></content>
     <summary type="html">
     <![CDATA[<h2 id="Continue…">Continue…</h2><hr>
@@ -927,7 +927,7 @@
 <figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-<span class="built_in">get</span> install <span class="keyword">python</span>-eventlet <span class="keyword">python</span>-routes <span class="keyword">python</span>-webob <span class="keyword">python</span>-paramiko</span><br></pre></td></tr></table></figure>
 <hr>
 <p>若安裝過程還是有問題，可以寄信給我或是在下面留言與我討論 =)</p>
-<p>十分歡迎有在研究 SDN 的朋友一起討論!!<br>Email Address : <a href="&#x6d;&#x61;&#x69;&#x6c;&#116;&#111;&#58;&#x6c;&#x69;&#x6e;&#116;&#x6f;&#110;&#64;&#105;&#105;&#x69;&#46;&#111;&#114;&#x67;&#x2e;&#x74;&#119;">&#x6c;&#x69;&#x6e;&#116;&#x6f;&#110;&#64;&#105;&#105;&#x69;&#46;&#111;&#114;&#x67;&#x2e;&#x74;&#119;</a>  ;  <a href="&#x6d;&#x61;&#x69;&#x6c;&#116;&#x6f;&#x3a;&#105;&#114;&#101;&#x72;&#x69;&#x33;&#51;&#57;&#x40;&#x67;&#109;&#97;&#x69;&#108;&#x2e;&#99;&#x6f;&#x6d;">&#105;&#114;&#101;&#x72;&#x69;&#x33;&#51;&#57;&#x40;&#x67;&#109;&#97;&#x69;&#108;&#x2e;&#99;&#x6f;&#x6d;</a></p>
+<p>十分歡迎有在研究 SDN 的朋友一起討論!!<br>Email Address : <a href="&#x6d;&#97;&#x69;&#x6c;&#116;&#111;&#58;&#108;&#x69;&#x6e;&#116;&#x6f;&#x6e;&#64;&#x69;&#105;&#105;&#46;&#x6f;&#x72;&#103;&#46;&#x74;&#x77;">&#108;&#x69;&#x6e;&#116;&#x6f;&#x6e;&#64;&#x69;&#105;&#105;&#46;&#x6f;&#x72;&#103;&#46;&#x74;&#x77;</a>  ;  <a href="&#109;&#97;&#105;&#108;&#x74;&#111;&#x3a;&#x69;&#x72;&#x65;&#114;&#105;&#x33;&#51;&#x39;&#64;&#x67;&#x6d;&#x61;&#105;&#108;&#x2e;&#99;&#111;&#x6d;">&#x69;&#x72;&#x65;&#114;&#105;&#x33;&#51;&#x39;&#64;&#x67;&#x6d;&#x61;&#105;&#108;&#x2e;&#99;&#111;&#x6d;</a></p>
 ]]></content>
     <summary type="html">
     <![CDATA[<p>在安裝 Ryu 的過程中並沒有像官方網站所說的那麼順利，踩到一些莫名的小地雷在這邊做一下筆記。</p>
