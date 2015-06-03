@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html>
+    
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="John&#39;s Lin Blog">
+    <title>安裝 Linux Mint 15 &amp; Windows 7 雙作業系統 - John&#39;s Lin Blog</title>
+    <meta name="author" content="John Lin">
+    <meta name="description" content="John&#39;s Lin Blog">
+    <link rel="icon" href="/assets/images/favicon.ico">
+    
+        <link rel="alternative" type="application/atom+xml" title="RSS" href="atom.xml">
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style.min.css" type="text/css">
+    <!--STYLES END-->
+    
+    <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-47712773-1']);
+        _gaq.push(['_trackPageview']);
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+
+</head>
+
+    <body>
+        <div id="blog">
+            <header id="header">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars "></i>
+    <h1 class="header-title">
+        <a class="header-title-link" href="http://linton.tw">John&#39;s Lin Blog</a>
+    </h1>
+    
+        <a class="header-picture-link" href="/#about">
+            <img class="header-picture" src="http://www.gravatar.com/avatar/98b5759510e487ade4145247bc856366?s=90"/>
+        </a>
+    
+</header>
+            <nav id="sidebar">
+    
+        <div class="sidebar-profile">
+            <a href="/#about">
+                
+                    <img class="sidebar-profile-picture" src="http://www.gravatar.com/avatar/98b5759510e487ade4145247bc856366?s=90"/>
+                
+            </a>
+            <span class="sidebar-profile-name hide-md">John Lin</span>
+        </div>
+    
+    
+        <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+                        <span class="sidebar-button-desc hide-md">Home</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/all-categories">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+                        <span class="sidebar-button-desc hide-md">Categories</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/all-tags">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+                        <span class="sidebar-button-desc hide-md">Tags</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/all-archives">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+                        <span class="sidebar-button-desc hide-md">Archives</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/#about">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+                        <span class="sidebar-button-desc hide-md">About me</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://m103.nthu.edu.tw/~s103064502/" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-file-text"></i>
+                        <span class="sidebar-button-desc hide-md">Résumé</span>
+                    </a>
+                </li>
+            
+        </ul>
+    
+        <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="https://github.com/John-Lin/" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+                        <span class="sidebar-button-desc hide-md">GitHub</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="https://twitter.com/Linton_tw" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-twitter"></i>
+                        <span class="sidebar-button-desc hide-md">Twitter</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="mailto://linton.tw@gmail.com" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-envelope-o"></i>
+                        <span class="sidebar-button-desc hide-md">Mail</span>
+                    </a>
+                </li>
+            
+        </ul>
+    
+        <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/atom.xml">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+                        <span class="sidebar-button-desc hide-md">RSS</span>
+                    </a>
+                </li>
+            
+        </ul>
+    
+</nav>
+            <div id="main">
+                
+<article class="post" itemscope itemType="http://schema.org/BlogPosting">
+    
+        <div class="post-header main-content-wrap">
+    
+        <h1 class="post-title" itemprop="headline">安裝 Linux Mint 15 &amp; Windows 7 雙作業系統</h1>
+    
+    <div class="post-meta">
+    <time  itemprop="datePublished" content="Fri Sep 06 2013 09:37:00 GMT+0800">
+        Sep 06, 2013
+    </time>
+    
+</div>
+</div>
+    
+    <div class="post-content markdown main-content-wrap" itemprop="articleBody">
+        <h2 id="前言"><strong>前言</strong></h2><hr>
+<p>以前在使用Linux的作業系統時，都是將Ubuntu裝在一台很舊的PC上，使用上倒也沒有什麼地方可以挑剔。近來<a href="http://distrowatch.com/dwres.php?resource=popularity" target="_blank" rel="external">Mint的崛起</a>讓我有點心動想要跳槽過去。</p>
+<p>使用起來是覺得Mint的GUI更加直覺好用。因為老舊的PC即將壽終正寢，我就把Mint裝在我的Notebook上，但又想保留Windows 7所以做了雙系統的配置，以下本篇將記錄安裝的過程。</p>
+<p>目前採用<a href="http://www.linuxmint.com/download.php" target="_blank" rel="external">Linux Mint 15 Olivia</a> Desktop版本則是使用<a href="http://cinnamon.linuxmint.com/" target="_blank" rel="external">Cinnamon</a>，搭配Windows 7雙系統。</p>
+<h2 id="前置準備作業"><strong>前置準備作業</strong></h2><hr>
+<ul>
+<li>4G以上 USB 一支</li>
+<li>已經安裝好Windows 7 筆電一台</li>
+</ul>
+<a id="more"></a>
+<h2 id="1-_Windows_7壓縮磁碟">1. <strong>Windows 7壓縮磁碟</strong></h2><hr>
+<p><strong>說明</strong>：首先要在Windows 7的C槽底下壓縮一塊空間，這塊空間將會是你的Linux所擁有的大小。</p>
+<p><strong>操作</strong>：進入「我的電腦」的「磁碟管理」在C槽那按右鍵選擇「壓縮磁碟區」，在跳出的視窗找「輸入要壓縮的空間大小」這裡就是Linux將佔有的空間，請輸入你所規劃的空間大小，完成後點擊下面的「壓縮」。</p>
+<h2 id="2-_Linux_Mint_15_映像檔轉可開機的Live_USB">2. <strong>Linux Mint 15 映像檔轉可開機的Live USB</strong></h2><hr>
+<p><strong>說明</strong>：以往安裝Linux都需要把ISO燒錄進CD做Live CD，不過此方法既不環保，也不夠快速。這裡推薦一個軟體<a href="http://unetbootin.sourceforge.net" target="_blank" rel="external">UNetbootin</a>它能將Linux的ISO檔弄進去USB裡面做成Live USB。</p>
+<p><strong>操作</strong>：下載後直接開啓程式，選「映像檔」挑選已經下載好的Linux Mint 15 ISO檔，按下確定後等待完成即可。</p>
+<h2 id="3-_Linux_Mint硬碟分割">3. <strong>Linux Mint硬碟分割</strong></h2><hr>
+<p><strong>說明</strong>：做硬碟分割的時候跟一般Linux一樣，主要分割出4個區塊</p>
+<ul>
+<li><p>Swap 磁區: Swap 磁區功能是使用硬碟空間來作為虛擬記憶體，但現今記憶體(RAM)十分便宜，隨處都能看到4G以上的RAM，所以這塊區域可以規劃小一點。至於到底要設多大?請參考<a href="https://help.ubuntu.com/community/SwapFaq#How_much_swap_do_I_need.3F" target="_blank" rel="external">Ubuntu 官方幫助</a>而目前我是設定1GB。</p>
+</li>
+<li><p>/root: 根目錄又做”/“是整個系統最重要的一個目錄，所有的目錄皆是根目錄衍生而來，裡面的資料為系統開機時需要特定的開機軟體、核心檔案、開機所需程式、 函式庫等等檔案資料。通常不需要設很大，因為應用程式不建議安裝在這裡，保持根目錄小可以使系效能更加。建議配置15G~20G。</p>
+</li>
+<li><p>/boot: 這個目錄主要在放置開機會使用到的檔案，包括Linux核心檔案以及開機選單與開機所需設定檔等等。不需要設定很大，建議配置500MB~1000MB。</p>
+</li>
+<li><p>/home: 這是系統預設的使用者家目錄，用來放個人資料與應用程式的地方，建議此項最後配置，所剩空間全部歸給他。</p>
+</li>
+</ul>
+<p><strong>操作</strong>：將電腦關機後先插上USB，開機後進入BIOS修改開機順序，選擇USB啟動儲存後離開，系統將重新啟動進入Linux Mint 15 的桌面後，雙擊桌面Install Linux Mint後開始安裝，選擇語言後開始分割系統硬碟。</p>
+<p>當出現分配硬碟空間時，請選第三個選項”Something else”，然後選擇Free space點選下方的「新增」接著開始按照上述的說明分配硬碟空間。</p>
+<p><strong>注意以下幾點:</strong></p>
+<ul>
+<li><p>Type of new partition: Swap磁區空間請選擇Logical，其他的選為Primary</p>
+</li>
+<li><p>New partiotion size in MB: 輸入個磁區想要分配的大小，可參考上述的說明</p>
+</li>
+<li><p>Location for the new partition(磁碟區的位置): 都是選beginning</p>
+</li>
+<li><p>Use as: 除Swap選擇SWAP其他則選Ext4</p>
+</li>
+<li><p>Mount point(掛載點): 裡面有”/“, “/boot”, “/home”，而Swap不需要選</p>
+<p>全部設定完後，就可以選擇Install Now，大致上就算完成了。</p>
+</li>
+</ul>
+<p><img src="http://user-image.logdown.io/user/3997/blog/4047/post/110327/mdyn6MEYQsasvPpi2bKz_Screenshot%20from%202013-09-06%2021:54:39.png" alt="Screenshot from 2013-09-06 21:54:39.png"></p>
+
+        
+            
+        
+    </div>
+    <div class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/Linux-Mint/">Linux Mint</a>
+
+            </div>
+        
+        <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2013/10/08/introduction-to-working-with-pyinstaller20/"  data-tooltip="PyInstaller 2.0 使用簡介">
+                
+                    <i class="fa fa-angle-left"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2013/09/06/pick-photo-utility/" data-tooltip="挑選照片工具程式">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://linton.tw/2013/09/06/set-up-linux-mint-15/">
+                <i class="fa fa-google-plus"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://linton.tw/2013/09/06/set-up-linux-mint-15/">
+                <i class="fa fa-facebook-official"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://linton.tw/2013/09/06/set-up-linux-mint-15/">
+                <i class="fa fa-twitter"></i>
+            </a>
+        </li>
+        
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                    <i class="fa fa-comment-o"></i>
+                </a>
+            </li>
+        
+    </ul>
+</div>
+
+
+        
+            <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2015 John Lin. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div class="post-bottom-bar">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2013/10/08/introduction-to-working-with-pyinstaller20/"  data-tooltip="PyInstaller 2.0 使用簡介">
+                
+                    <i class="fa fa-angle-left"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2013/09/06/pick-photo-utility/" data-tooltip="挑選照片工具程式">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://linton.tw/2013/09/06/set-up-linux-mint-15/">
+                <i class="fa fa-google-plus"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://linton.tw/2013/09/06/set-up-linux-mint-15/">
+                <i class="fa fa-facebook-official"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://linton.tw/2013/09/06/set-up-linux-mint-15/">
+                <i class="fa fa-twitter"></i>
+            </a>
+        </li>
+        
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                    <i class="fa fa-comment-o"></i>
+                </a>
+            </li>
+        
+    </ul>
+</div>
+
+
+                </div>
+            
+        </div>
+        <div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-remove"></i>
+        </div>
+        
+            <img id="about-card-picture" src="http://www.gravatar.com/avatar/98b5759510e487ade4145247bc856366?s=110"/>
+        
+            <h4 id="about-card-name">John Lin</h4>
+        
+            <h5 id="about-card-bio">I&#39;m very enthusiastic about Open Source projects and passionate about Python and Node.js!</h5>
+        
+        
+            <h5 id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                Software developer
+            </h5>
+        
+        
+            <h5 id="about-card-location">
+                <i class="fa fa-map-marker"></i>
+                <br/>
+                Taipei, Taiwan
+            </h5>
+        
+    </div>
+</div>
+        <div id="cover" style="background-image:url('/assets/images/cover.png');"></div>
+    </body>
+    <!--SCRIPTS-->
+<script src="/assets/js/script.min.js" type="text/javascript"></script>
+<!--SCRIPTS END-->
+
+    <script type="text/javascript">
+        var disqus_shortname = 'lintontw';
+        (function() {
+            var dsq = document.createElement('script');
+            dsq.type = 'text/javascript';
+            dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+
+
+</html>

@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html>
+    
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="John&#39;s Lin Blog">
+    <title>Install Snort from source on Ubuntu - John&#39;s Lin Blog</title>
+    <meta name="author" content="John Lin">
+    <meta name="description" content="John&#39;s Lin Blog">
+    <link rel="icon" href="/assets/images/favicon.ico">
+    
+        <link rel="alternative" type="application/atom+xml" title="RSS" href="atom.xml">
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style.min.css" type="text/css">
+    <!--STYLES END-->
+    
+    <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-47712773-1']);
+        _gaq.push(['_trackPageview']);
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+
+</head>
+
+    <body>
+        <div id="blog">
+            <header id="header">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars "></i>
+    <h1 class="header-title">
+        <a class="header-title-link" href="http://linton.tw">John&#39;s Lin Blog</a>
+    </h1>
+    
+        <a class="header-picture-link" href="/#about">
+            <img class="header-picture" src="http://www.gravatar.com/avatar/98b5759510e487ade4145247bc856366?s=90"/>
+        </a>
+    
+</header>
+            <nav id="sidebar">
+    
+        <div class="sidebar-profile">
+            <a href="/#about">
+                
+                    <img class="sidebar-profile-picture" src="http://www.gravatar.com/avatar/98b5759510e487ade4145247bc856366?s=90"/>
+                
+            </a>
+            <span class="sidebar-profile-name hide-md">John Lin</span>
+        </div>
+    
+    
+        <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+                        <span class="sidebar-button-desc hide-md">Home</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/all-categories">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+                        <span class="sidebar-button-desc hide-md">Categories</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/all-tags">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+                        <span class="sidebar-button-desc hide-md">Tags</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/all-archives">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+                        <span class="sidebar-button-desc hide-md">Archives</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/#about">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+                        <span class="sidebar-button-desc hide-md">About me</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://m103.nthu.edu.tw/~s103064502/" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-file-text"></i>
+                        <span class="sidebar-button-desc hide-md">Résumé</span>
+                    </a>
+                </li>
+            
+        </ul>
+    
+        <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="https://github.com/John-Lin/" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+                        <span class="sidebar-button-desc hide-md">GitHub</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="https://twitter.com/Linton_tw" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-twitter"></i>
+                        <span class="sidebar-button-desc hide-md">Twitter</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="mailto://linton.tw@gmail.com" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-envelope-o"></i>
+                        <span class="sidebar-button-desc hide-md">Mail</span>
+                    </a>
+                </li>
+            
+        </ul>
+    
+        <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/atom.xml">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+                        <span class="sidebar-button-desc hide-md">RSS</span>
+                    </a>
+                </li>
+            
+        </ul>
+    
+</nav>
+            <div id="main">
+                
+<article class="post" itemscope itemType="http://schema.org/BlogPosting">
+    
+        <div class="post-header main-content-wrap">
+    
+        <h1 class="post-title" itemprop="headline">Install Snort from source on Ubuntu</h1>
+    
+    <div class="post-meta">
+    <time  itemprop="datePublished" content="Sun Aug 17 2014 00:30:45 GMT+0800">
+        Aug 17, 2014
+    </time>
+    
+</div>
+</div>
+    
+    <div class="post-content markdown main-content-wrap" itemprop="articleBody">
+        <p>Some installation notes about install snort from source code on Ubuntu 14.04</p>
+<p><img src="http://user-image.logdown.io/user/3997/blog/4047/post/220885/K33ZZzbfQw2fjtOtgljt_SnortTM.png" alt="SnortTM.png"></p>
+<a id="more"></a>
+<h3 id="Install_prerequrites_for_compiling_snort">Install prerequrites for compiling snort</h3><figure class="highlight q"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-<span class="built_in">get</span> <span class="keyword">update</span></span><br><span class="line">$ sudo apt-<span class="built_in">get</span> install flex bison build-essential checkinstall \ </span><br><span class="line">libpcap-<span class="built_in">dev</span> libnet1-<span class="built_in">dev</span> libpcre3-<span class="built_in">dev</span> libmysqlclient15-<span class="built_in">dev</span> \ </span><br><span class="line">libnetfilter-queue-<span class="built_in">dev</span> iptables-<span class="built_in">dev</span></span><br></pre></td></tr></table></figure>
+<hr>
+<h3 id="Download_DAQ,_Snort,_Libdnet_source_code">Download DAQ, Snort, Libdnet source code</h3><figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$ </span>wget <span class="symbol">https:</span>/<span class="regexp">/www.snort.org/downloads</span><span class="regexp">/snort/daq</span>-<span class="number">2.0</span>.<span class="number">2</span>.tar.gz</span><br><span class="line"><span class="variable">$ </span>wget <span class="symbol">https:</span>/<span class="regexp">/www.snort.org/downloads</span><span class="regexp">/snort/snort</span>-<span class="number">2.9</span>.<span class="number">6.2</span>.tar.gz</span><br><span class="line"><span class="variable">$ </span>wget <span class="symbol">http:</span>/<span class="regexp">/libdnet.googlecode.com/files</span><span class="regexp">/libdnet-1.12.tgz</span></span><br></pre></td></tr></table></figure>
+<hr>
+<h3 id="Unzip,_make_and_install_Libdnet">Unzip, make and install <a href="https://code.google.com/p/libdnet/" target="_blank" rel="external">Libdnet</a></h3><figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$ </span>tar zxvf libdnet-<span class="number">1.12</span>.tgz</span><br><span class="line"><span class="variable">$ </span>cd libdnet-<span class="number">1.12</span>/</span><br><span class="line"><span class="variable">$ </span>./configure; make</span><br><span class="line"><span class="variable">$ </span>sudo checkinstall</span><br><span class="line"><span class="variable">$ </span>sudo dpkg -i libdnet_1.<span class="number">12</span>-<span class="number">1_</span>amd64.deb</span><br><span class="line"><span class="variable">$ </span>sudo ln -s /usr/local/lib/libdnet.<span class="number">1.0</span>.<span class="number">1</span> /usr/lib/libdnet.<span class="number">1</span></span><br></pre></td></tr></table></figure>
+<p>When you type <code>sudo checkinstall</code> will encounter The following messages</p>
+<ul>
+<li><p>Should I Creat a default set of package docs? </p>
+<p>  Usually we used default, type y and Enter</p>
+</li>
+<li><p>You probably don’t want them to be included in the package. Do you want me to list them?  [n]: n</p>
+</li>
+<li><p>Should I exclude them from the package? (Saying yes is a good idea)  [n]: y</p>
+</li>
+</ul>
+<hr>
+<h3 id="Unzip,_make_and_install_DAQ">Unzip, make and install DAQ</h3><figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$ </span>tar xvfz daq-<span class="number">2.0</span>.<span class="number">2</span>.tar.gz</span><br><span class="line"><span class="variable">$ </span>cd daq-<span class="number">2.0</span>.<span class="number">2</span></span><br><span class="line"><span class="variable">$ </span>./configure <span class="string">"CFLAGS=-fPIC"</span>; make</span><br><span class="line"><span class="variable">$ </span>sudo checkinstall</span><br><span class="line"><span class="variable">$ </span>sudo dpkg -i daq_2.<span class="number">0</span>.<span class="number">2</span>-<span class="number">1_</span>amd64.deb</span><br></pre></td></tr></table></figure>
+<p>When you type <code>sudo checkinstall</code> will pop out the same meeeages again. Using the same solutions above.</p>
+<hr>
+<h3 id="Unzip,_make_and_install_Snort">Unzip, make and install Snort</h3><figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$ </span>tar xvfz snort-<span class="number">2.9</span>.<span class="number">6.2</span>.tar.gz</span><br><span class="line"><span class="variable">$ </span>cd snort-<span class="number">2.9</span>.<span class="number">6.2</span></span><br><span class="line"><span class="variable">$ </span>./configure --enable-sourcefire; make</span><br><span class="line"><span class="variable">$ </span>sudo checkinstall</span><br><span class="line"><span class="variable">$ </span>sudo dpkg -i snort_2.<span class="number">9.6</span>.<span class="number">2</span>-<span class="number">1_</span>amd64.deb</span><br><span class="line"><span class="variable">$ </span>sudo ln -s /usr/local/bin/snort /usr/sbin/snort</span><br><span class="line"><span class="variable">$ </span>sudo ldconfig -v</span><br></pre></td></tr></table></figure>
+<p>When you type <code>sudo checkinstall</code> will pop out the same meeeages again. Using the same solutions above.</p>
+<hr>
+<h3 id="Testing_Snort">Testing Snort</h3><figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$ </span>snort -<span class="constant">V</span></span><br></pre></td></tr></table></figure>
+<p><img src="http://user-image.logdown.io/user/3997/blog/4047/post/220885/5V4NHUdTAWXyDPR4O1Dq_%E8%9E%A2%E5%B9%95%E6%88%AA%E5%9C%96%202014-08-16%2018.55.37.png" alt="screenshot.png"></p>
+<hr>
+<h3 id="Some_trivial_settings">Some trivial settings</h3><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$ sudo groupadd snort</span><br><span class="line">$ sudo useradd snort -d <span class="regexp">/var/</span>log<span class="regexp">/snort -s /</span>sbin/nologin -c SNORT_IDS -g snort</span><br><span class="line"></span><br><span class="line">$ sudo mkdir <span class="regexp">/var/</span>log/snort</span><br><span class="line">$ sudo chown <span class="string">snort:</span>snort <span class="regexp">/var/</span>log/snort</span><br><span class="line"></span><br><span class="line">$ sudo mkdir <span class="regexp">/etc/</span>snort</span><br><span class="line">$ sudo tar zxvf snortrules-snapshot-<span class="number">2962.</span>tar.gz -C <span class="regexp">/etc/</span>snort/</span><br><span class="line">$ sudo touch <span class="regexp">/etc/</span>snort<span class="regexp">/rules/</span>white_list.rules <span class="regexp">/etc/</span>snort<span class="regexp">/rules/</span>black_list.rules</span><br><span class="line">$ sudo mkdir <span class="regexp">/usr/</span>local<span class="regexp">/lib/</span>snort_dynamicrules</span><br><span class="line"></span><br><span class="line">$ sudo chown -R <span class="string">snort:</span>snort <span class="regexp">/etc/</span>snort<span class="comment">/*</span><br><span class="line">$ sudo mv /etc/snort/etc<span class="comment">/* /etc/snort/</span></span></span><br></pre></td></tr></table></figure>
+<p><strong>For snortrules-snapshot-2962 snort rules, need to sign up and download the subscriber rules from <a href="https://www.snort.org/users/sign_in" target="_blank" rel="external">here</a></strong></p>
+<hr>
+<h3 id="Edit_the_snort_configuration_file">Edit the snort configuration file</h3><p>There are two parts of configuriton have to modify</p>
+<ul>
+<li>Internal and External Network address </li>
+</ul>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Setup the network addresses you are protecting</span></span><br><span class="line"><span class="comment"># ipvar HOME_NET any</span></span><br><span class="line"><span class="title">ipvar</span> HOME_NET <span class="number">192.168.8.0</span>/<span class="number">24</span></span><br><span class="line"><span class="comment"># Here you need to check your network configure by using ifconfig</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Set up the external network addresses. Leave as "any" in most situations</span></span><br><span class="line"><span class="comment"># ipvar EXTERNAL_NET any</span></span><br><span class="line">ipvar EXTERNAL_NET !<span class="variable">$HOME_NET</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>Path to your rules files</li>
+</ul>
+<figure class="highlight coffeescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Path to your rules files (this can be a relative path)</span></span><br><span class="line"><span class="comment"># Note for Windows users: You are advised to make this an absolute path,</span></span><br><span class="line"><span class="comment"># such as: c:\snort\rules</span></span><br><span class="line"><span class="reserved">var</span> RULE_PATH /etc/snort/rules</span><br><span class="line"><span class="reserved">var</span> SO_RULE_PATH /etc/snort/so_rules</span><br><span class="line"><span class="reserved">var</span> PREPROC_RULE_PATH /etc/snort/preproc_rules</span><br><span class="line"></span><br><span class="line"><span class="comment"># If you are using repution preprocessor set these</span></span><br><span class="line"><span class="reserved">var</span> WHITE_LIST_PATH /etc/snort/rules</span><br><span class="line"><span class="reserved">var</span> BLACK_LIST_PATH /etc/snort/rules</span><br></pre></td></tr></table></figure>
+<hr>
+<h3 id="Starts_Snort_in_self-test_mode">Starts Snort in self-test mode</h3><figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo snort -T -i eth0 -<span class="keyword">u</span> snort -<span class="keyword">g</span> snort -c /etc/snort/snort.<span class="keyword">conf</span></span><br></pre></td></tr></table></figure>
+<p>If there is a messagge said “Snort successfully validated the configuration! Snort exiting”, it’successful.</p>
+<p><img src="http://user-image.logdown.io/user/3997/blog/4047/post/220885/nnyVFfgiRFyuyO7wAgpp_%E8%9E%A2%E5%B9%95%E6%88%AA%E5%9C%96%202014-08-17%2000.37.45.png" alt="screenshot_self_test.png"></p>
+<hr>
+<h3 id="Troubleshoot">Troubleshoot</h3><ul>
+<li>snort: error while loading shared libraries: libsfbpf.so.0: cannot open shared object file: No such file or directory</li>
+</ul>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$ </span>sudo ldconfig</span><br></pre></td></tr></table></figure>
+<ul>
+<li>error-snort: error while loading shared libraries: libdnet.1: cannot open shared object file: No such file or directory</li>
+</ul>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo ln -s <span class="regexp">/usr/</span>local<span class="regexp">/lib/</span>libdnet.<span class="number">1.0</span>.<span class="number">1</span> <span class="regexp">/usr/</span>lib<span class="regexp">/libdnet.1</span></span><br></pre></td></tr></table></figure>
+<hr>
+<h3 id="Reference">Reference</h3><ul>
+<li><p><a href="https://www.youtube.com/watch?v=GVvS8Peb2fY" target="_blank" rel="external">Snort Install on Ubuntu 14.04LTS Part 1 on Youtube</a></p>
+</li>
+<li><p><a href="http://www.linuxquestions.org/questions/linux-newbie-8/snort-error-while-loading-shared-libraries-libdnet-1-cannot-open-shared-object-fil-901530/" target="_blank" rel="external">snort: error while loading shared libraries: libdnet.1: cannot open shared object fil</a></p>
+</li>
+<li><p><a href="http://seclists.org/snort/2010/q4/322" target="_blank" rel="external">Re: Snort 2.9 Setup Guide</a></p>
+</li>
+</ul>
+
+        
+            
+        
+    </div>
+    <div class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/Snort/">Snort</a>
+
+            </div>
+        
+        <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2014/09/03/Ryu-with-Snort-Integration/"  data-tooltip="Ryu with Snort Integration">
+                
+                    <i class="fa fa-angle-left"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2014/08/11/NTT-Network-Innovation-Laboratories-SDN-Seminar/" data-tooltip="NTT 未來網路研究所 SDN 研討會">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://linton.tw/2014/08/17/Install-Snort-from-source-on-Ubuntu/">
+                <i class="fa fa-google-plus"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://linton.tw/2014/08/17/Install-Snort-from-source-on-Ubuntu/">
+                <i class="fa fa-facebook-official"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://linton.tw/2014/08/17/Install-Snort-from-source-on-Ubuntu/">
+                <i class="fa fa-twitter"></i>
+            </a>
+        </li>
+        
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                    <i class="fa fa-comment-o"></i>
+                </a>
+            </li>
+        
+    </ul>
+</div>
+
+
+        
+            <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2015 John Lin. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div class="post-bottom-bar">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2014/09/03/Ryu-with-Snort-Integration/"  data-tooltip="Ryu with Snort Integration">
+                
+                    <i class="fa fa-angle-left"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2014/08/11/NTT-Network-Innovation-Laboratories-SDN-Seminar/" data-tooltip="NTT 未來網路研究所 SDN 研討會">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://linton.tw/2014/08/17/Install-Snort-from-source-on-Ubuntu/">
+                <i class="fa fa-google-plus"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://linton.tw/2014/08/17/Install-Snort-from-source-on-Ubuntu/">
+                <i class="fa fa-facebook-official"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://linton.tw/2014/08/17/Install-Snort-from-source-on-Ubuntu/">
+                <i class="fa fa-twitter"></i>
+            </a>
+        </li>
+        
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                    <i class="fa fa-comment-o"></i>
+                </a>
+            </li>
+        
+    </ul>
+</div>
+
+
+                </div>
+            
+        </div>
+        <div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-remove"></i>
+        </div>
+        
+            <img id="about-card-picture" src="http://www.gravatar.com/avatar/98b5759510e487ade4145247bc856366?s=110"/>
+        
+            <h4 id="about-card-name">John Lin</h4>
+        
+            <h5 id="about-card-bio">I&#39;m very enthusiastic about Open Source projects and passionate about Python and Node.js!</h5>
+        
+        
+            <h5 id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                Software developer
+            </h5>
+        
+        
+            <h5 id="about-card-location">
+                <i class="fa fa-map-marker"></i>
+                <br/>
+                Taipei, Taiwan
+            </h5>
+        
+    </div>
+</div>
+        <div id="cover" style="background-image:url('/assets/images/cover.png');"></div>
+    </body>
+    <!--SCRIPTS-->
+<script src="/assets/js/script.min.js" type="text/javascript"></script>
+<!--SCRIPTS END-->
+
+    <script type="text/javascript">
+        var disqus_shortname = 'lintontw';
+        (function() {
+            var dsq = document.createElement('script');
+            dsq.type = 'text/javascript';
+            dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+
+
+</html>

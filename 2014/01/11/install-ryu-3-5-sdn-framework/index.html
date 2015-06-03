@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html>
+    
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="John&#39;s Lin Blog">
+    <title>[筆記] Install Ryu 3.5 - SDN Framework  - John&#39;s Lin Blog</title>
+    <meta name="author" content="John Lin">
+    <meta name="description" content="John&#39;s Lin Blog">
+    <link rel="icon" href="/assets/images/favicon.ico">
+    
+        <link rel="alternative" type="application/atom+xml" title="RSS" href="atom.xml">
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style.min.css" type="text/css">
+    <!--STYLES END-->
+    
+    <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-47712773-1']);
+        _gaq.push(['_trackPageview']);
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+
+</head>
+
+    <body>
+        <div id="blog">
+            <header id="header">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars "></i>
+    <h1 class="header-title">
+        <a class="header-title-link" href="http://linton.tw">John&#39;s Lin Blog</a>
+    </h1>
+    
+        <a class="header-picture-link" href="/#about">
+            <img class="header-picture" src="http://www.gravatar.com/avatar/98b5759510e487ade4145247bc856366?s=90"/>
+        </a>
+    
+</header>
+            <nav id="sidebar">
+    
+        <div class="sidebar-profile">
+            <a href="/#about">
+                
+                    <img class="sidebar-profile-picture" src="http://www.gravatar.com/avatar/98b5759510e487ade4145247bc856366?s=90"/>
+                
+            </a>
+            <span class="sidebar-profile-name hide-md">John Lin</span>
+        </div>
+    
+    
+        <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+                        <span class="sidebar-button-desc hide-md">Home</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/all-categories">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+                        <span class="sidebar-button-desc hide-md">Categories</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/all-tags">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+                        <span class="sidebar-button-desc hide-md">Tags</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/all-archives">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+                        <span class="sidebar-button-desc hide-md">Archives</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/#about">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+                        <span class="sidebar-button-desc hide-md">About me</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://m103.nthu.edu.tw/~s103064502/" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-file-text"></i>
+                        <span class="sidebar-button-desc hide-md">Résumé</span>
+                    </a>
+                </li>
+            
+        </ul>
+    
+        <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="https://github.com/John-Lin/" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+                        <span class="sidebar-button-desc hide-md">GitHub</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="https://twitter.com/Linton_tw" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-twitter"></i>
+                        <span class="sidebar-button-desc hide-md">Twitter</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="mailto://linton.tw@gmail.com" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-envelope-o"></i>
+                        <span class="sidebar-button-desc hide-md">Mail</span>
+                    </a>
+                </li>
+            
+        </ul>
+    
+        <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/atom.xml">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+                        <span class="sidebar-button-desc hide-md">RSS</span>
+                    </a>
+                </li>
+            
+        </ul>
+    
+</nav>
+            <div id="main">
+                
+<article class="post" itemscope itemType="http://schema.org/BlogPosting">
+    
+        <div class="post-header main-content-wrap">
+    
+        <h1 class="post-title" itemprop="headline">[筆記] Install Ryu 3.5 - SDN Framework </h1>
+    
+    <div class="post-meta">
+    <time  itemprop="datePublished" content="Sat Jan 11 2014 03:58:00 GMT+0800">
+        Jan 11, 2014
+    </time>
+    
+</div>
+</div>
+    
+    <div class="post-content markdown main-content-wrap" itemprop="articleBody">
+        <p>在安裝 Ryu 的過程中並沒有像官方網站所說的那麼順利，踩到一些莫名的小地雷在這邊做一下筆記。</p>
+<h3 id="[更新_2014/02/15]_這是_Ryu_3-5_時做的筆記，目前已經更新為_Ryu_3-6_請參考[最新版的安裝方法]!">[更新 2014/02/15] 這是 Ryu 3.5 時做的筆記，目前已經更新為 Ryu 3.6 請參考[最新版的安裝方法]!</h3><h3 id="[問題]">[問題]</h3><hr>
+<p><a href="http://osrg.github.io/ryu/" target="_blank" rel="external"><strong>官方版安裝方教學</strong></a> 宣稱可以選用<br><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo pip <span class="keyword">install</span> ryu</span><br></pre></td></tr></table></figure></p>
+<p>或是從 Github 上 clone 原始碼下來安裝</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git clone http<span class="variable">s:</span>//github.<span class="keyword">com</span>/osrg/ryu.git</span><br><span class="line">$ <span class="keyword">cd</span> ryu; <span class="keyword">python</span> ./setup.<span class="keyword">py</span> install</span><br></pre></td></tr></table></figure>
+<p>以上兩種我都試過， <strong>沒辦法順利的安裝</strong> ，似乎會少一些相依性的套件？</p>
+<a id="more"></a>
+<h3 id="[解決方法]">[解決方法]</h3><hr>
+<p>我先用 <code>sudo pip install ryu</code> 之後 ，在執行 <code>ryu-manager</code> 時會出現一些錯誤，請注意最後幾行錯誤訊息，會抱怨少了什麼套件，套件名稱如下請用 <code>sudo pip install</code>手動重新裝過補齊（大約缺了5個套件）。</p>
+<p>這邊列出缺少的套件，請用 <code>sudo pip install</code> 逐一安裝</p>
+<ul>
+<li>msgpack-python </li>
+<li>oslo.config </li>
+<li>netaddr </li>
+<li>lxml</li>
+<li>ecdsa</li>
+</ul>
+<p><strong>請注意：</strong>其中有一個套件 <strong>lxml</strong> 在使用 <code>sudo pip install lxml</code> 也沒辦法順利安裝，似乎又少了某些相依的函式庫?</p>
+<p>請將 <strong>lxml</strong> 所需要的函式庫補齊，在 Command Line 下安裝以下的套件：</p>
+<figure class="highlight q"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-<span class="built_in">get</span> install libxml2-<span class="built_in">dev</span> libxslt1-<span class="built_in">dev</span> python2.7-<span class="built_in">dev</span></span><br></pre></td></tr></table></figure>
+<p>將 lxml 裝上之後，在執行 <code>ryu-manger</code> 時還會抱怨少一個套件 <strong>(ecdsa)</strong> ，再用 <code>sudo pip isntall</code> 裝上，就可以順利執行。</p>
+<h3 id="[2014/1/14_新增]">[2014/1/14 新增]</h3><hr>
+<p>Ryu 有一些相依性的套件必須要安裝，請用 <code>sudo apt-get install</code> 來安裝</p>
+<ul>
+<li>python-eventlet</li>
+<li>python-routes</li>
+<li>python-webob</li>
+<li>python-paramiko</li>
+</ul>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-<span class="built_in">get</span> install <span class="keyword">python</span>-eventlet <span class="keyword">python</span>-routes <span class="keyword">python</span>-webob <span class="keyword">python</span>-paramiko</span><br></pre></td></tr></table></figure>
+<hr>
+<p>若安裝過程還是有問題，可以寄信給我或是在下面留言與我討論 =)</p>
+<p>十分歡迎有在研究 SDN 的朋友一起討論!!<br>Email Address : <a href="&#x6d;&#x61;&#x69;&#x6c;&#x74;&#x6f;&#58;&#108;&#x69;&#110;&#116;&#111;&#110;&#64;&#x69;&#105;&#105;&#x2e;&#111;&#x72;&#x67;&#x2e;&#116;&#119;">&#108;&#x69;&#110;&#116;&#111;&#110;&#64;&#x69;&#105;&#105;&#x2e;&#111;&#x72;&#x67;&#x2e;&#116;&#119;</a>  ;  <a href="&#109;&#97;&#105;&#108;&#x74;&#111;&#58;&#x69;&#114;&#x65;&#x72;&#x69;&#x33;&#x33;&#57;&#64;&#x67;&#x6d;&#x61;&#x69;&#108;&#x2e;&#x63;&#111;&#x6d;">&#x69;&#114;&#x65;&#x72;&#x69;&#x33;&#x33;&#57;&#64;&#x67;&#x6d;&#x61;&#x69;&#108;&#x2e;&#x63;&#111;&#x6d;</a></p>
+
+        
+            
+        
+    </div>
+    <div class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/OpenFlow/">OpenFlow</a> <a class="tag tag--primary tag--small t-link" href="/tags/Python/">Python</a> <a class="tag tag--primary tag--small t-link" href="/tags/Ryu/">Ryu</a> <a class="tag tag--primary tag--small t-link" href="/tags/SDN/">SDN</a>
+
+            </div>
+        
+        <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2014/01/31/bug-office-for-mac-2011-shortcuts-fail/"  data-tooltip="[Bug] Office for Mac 2011 快捷鍵失效之有效解決方法">
+                
+                    <i class="fa fa-angle-left"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2013/12/03/raspberry-pi-x-sht15-humidity-detection/" data-tooltip="Raspberry Pi X SHT15 溫濕度偵測">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://linton.tw/2014/01/11/install-ryu-3-5-sdn-framework/">
+                <i class="fa fa-google-plus"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://linton.tw/2014/01/11/install-ryu-3-5-sdn-framework/">
+                <i class="fa fa-facebook-official"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://linton.tw/2014/01/11/install-ryu-3-5-sdn-framework/">
+                <i class="fa fa-twitter"></i>
+            </a>
+        </li>
+        
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                    <i class="fa fa-comment-o"></i>
+                </a>
+            </li>
+        
+    </ul>
+</div>
+
+
+        
+            <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2015 John Lin. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div class="post-bottom-bar">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2014/01/31/bug-office-for-mac-2011-shortcuts-fail/"  data-tooltip="[Bug] Office for Mac 2011 快捷鍵失效之有效解決方法">
+                
+                    <i class="fa fa-angle-left"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2013/12/03/raspberry-pi-x-sht15-humidity-detection/" data-tooltip="Raspberry Pi X SHT15 溫濕度偵測">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://linton.tw/2014/01/11/install-ryu-3-5-sdn-framework/">
+                <i class="fa fa-google-plus"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://linton.tw/2014/01/11/install-ryu-3-5-sdn-framework/">
+                <i class="fa fa-facebook-official"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://linton.tw/2014/01/11/install-ryu-3-5-sdn-framework/">
+                <i class="fa fa-twitter"></i>
+            </a>
+        </li>
+        
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                    <i class="fa fa-comment-o"></i>
+                </a>
+            </li>
+        
+    </ul>
+</div>
+
+
+                </div>
+            
+        </div>
+        <div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-remove"></i>
+        </div>
+        
+            <img id="about-card-picture" src="http://www.gravatar.com/avatar/98b5759510e487ade4145247bc856366?s=110"/>
+        
+            <h4 id="about-card-name">John Lin</h4>
+        
+            <h5 id="about-card-bio">I&#39;m very enthusiastic about Open Source projects and passionate about Python and Node.js!</h5>
+        
+        
+            <h5 id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                Software developer
+            </h5>
+        
+        
+            <h5 id="about-card-location">
+                <i class="fa fa-map-marker"></i>
+                <br/>
+                Taipei, Taiwan
+            </h5>
+        
+    </div>
+</div>
+        <div id="cover" style="background-image:url('/assets/images/cover.png');"></div>
+    </body>
+    <!--SCRIPTS-->
+<script src="/assets/js/script.min.js" type="text/javascript"></script>
+<!--SCRIPTS END-->
+
+    <script type="text/javascript">
+        var disqus_shortname = 'lintontw';
+        (function() {
+            var dsq = document.createElement('script');
+            dsq.type = 'text/javascript';
+            dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+
+
+</html>

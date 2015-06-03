@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html>
+    
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="John&#39;s Lin Blog">
+    <title>Ryu with Snort Integration - John&#39;s Lin Blog</title>
+    <meta name="author" content="John Lin">
+    <meta name="description" content="John&#39;s Lin Blog">
+    <link rel="icon" href="/assets/images/favicon.ico">
+    
+        <link rel="alternative" type="application/atom+xml" title="RSS" href="atom.xml">
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style.min.css" type="text/css">
+    <!--STYLES END-->
+    
+    <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-47712773-1']);
+        _gaq.push(['_trackPageview']);
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+
+</head>
+
+    <body>
+        <div id="blog">
+            <header id="header">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars "></i>
+    <h1 class="header-title">
+        <a class="header-title-link" href="http://linton.tw">John&#39;s Lin Blog</a>
+    </h1>
+    
+        <a class="header-picture-link" href="/#about">
+            <img class="header-picture" src="http://www.gravatar.com/avatar/98b5759510e487ade4145247bc856366?s=90"/>
+        </a>
+    
+</header>
+            <nav id="sidebar">
+    
+        <div class="sidebar-profile">
+            <a href="/#about">
+                
+                    <img class="sidebar-profile-picture" src="http://www.gravatar.com/avatar/98b5759510e487ade4145247bc856366?s=90"/>
+                
+            </a>
+            <span class="sidebar-profile-name hide-md">John Lin</span>
+        </div>
+    
+    
+        <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+                        <span class="sidebar-button-desc hide-md">Home</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/all-categories">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+                        <span class="sidebar-button-desc hide-md">Categories</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/all-tags">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+                        <span class="sidebar-button-desc hide-md">Tags</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/all-archives">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+                        <span class="sidebar-button-desc hide-md">Archives</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/#about">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+                        <span class="sidebar-button-desc hide-md">About me</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://m103.nthu.edu.tw/~s103064502/" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-file-text"></i>
+                        <span class="sidebar-button-desc hide-md">Résumé</span>
+                    </a>
+                </li>
+            
+        </ul>
+    
+        <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="https://github.com/John-Lin/" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+                        <span class="sidebar-button-desc hide-md">GitHub</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="https://twitter.com/Linton_tw" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-twitter"></i>
+                        <span class="sidebar-button-desc hide-md">Twitter</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="mailto://linton.tw@gmail.com" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-envelope-o"></i>
+                        <span class="sidebar-button-desc hide-md">Mail</span>
+                    </a>
+                </li>
+            
+        </ul>
+    
+        <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/atom.xml">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+                        <span class="sidebar-button-desc hide-md">RSS</span>
+                    </a>
+                </li>
+            
+        </ul>
+    
+</nav>
+            <div id="main">
+                
+<article class="post" itemscope itemType="http://schema.org/BlogPosting">
+    
+        <div class="post-header main-content-wrap">
+    
+        <h1 class="post-title" itemprop="headline">Ryu with Snort Integration</h1>
+    
+    <div class="post-meta">
+    <time  itemprop="datePublished" content="Wed Sep 03 2014 01:03:34 GMT+0800">
+        Sep 03, 2014
+    </time>
+    
+</div>
+</div>
+    
+    <div class="post-content markdown main-content-wrap" itemprop="articleBody">
+        <p><img src="http://user-image.logdown.io/user/3997/blog/4047/post/221103/QPs7nl8iTnS45kvEo5jz_snort_ryu.png" alt="snort_ryu.png"></p>
+<p>最近在 Ryu contribute 一些 <a href="https://github.com/osrg/ryu/commit/bbb7724423d79532e10450e1a250fb46e5215416" target="_blank" rel="external">patch</a> 終於加進去官方的 Project 了！<br>特地寫這篇稍微介紹一下 Snort Integration，也順便分享一下在 Ryu 官方本身是不希望貢獻者使用 Pull Request 的情況下，到底要怎麼對 Ryu project 做出你的貢獻呢？</p>
+<a id="more"></a>
+<p>首先大概簡單帶過一下 Snort 到底在做什麼事情，然後再談怎麼拿他去跟 Ryu 做整合。我的部落格<a href="http://linton.tw/2014/08/17/Install-Snort-from-source-on-Ubuntu/">上一篇</a>就是記錄了 Snort 怎麼安裝，有興趣的可以參考。</p>
+<h3 id="About_Snort">About Snort</h3><hr>
+<p>Snort 是一套開放源碼的入侵偵測系統（Intrusion Detection System）又稱作 IDS 。它能夠即時地監測網路上的封包，並透過 Snort Rule 比對攻擊模式，當發現疑似有網路攻擊的行為發生時，會發出警告的訊息（Alert message）通知網路管理者，攻擊者的 5-Tuple 與攻擊的手法，等等…</p>
+<p>這其中的精神在 Snort Rule 它裡面描述著各種網路攻擊的形態，例如：DDoS, SQL injection 等等…<br>Snort 會在拆解封包的過程逐一比對 Snort Rule 一旦命中 Rule 就會發出警告。你可以花錢跟 Snort 官方購買他們的 Rule 或者是使用社群版免費的 Rule，或甚至你熟稔網路攻擊的形態你就可以自行撰寫 Rule 來定義你的規則。</p>
+<h3 id="Integrate_with_Ryu">Integrate with Ryu</h3><hr>
+<p>在介紹怎麼整合之前有個小插曲，其實這個整合早在2013年的3月就有看到他們在做，可是不知道為什麼後來變成沒有人在維護，甚至那份資料還消失了！所幸我在 NTT 來台灣開的一場<a href="http://linton.tw/2014/08/11/NTT-Network-Innovation-Laboratories-SDN-Seminar/"> SDN 研討會</a>上，問了他們的 project lead 這個問題，會後他說會寄給我那篇 Snort Integrate 資料。</p>
+<p>收到了這份資料之後，才發現他們沒再繼續做更新，為什麼需要更新呢？原因是 Ryu 曾經在某一版本的時候從使用 Gevent 換到 Eventlet （據他們表示，是因為 OpenStack 都是用 Eventlet 的框架去開發，為了跟 OpenStack 有比較高的整合度，所以才做出這個大改版）</p>
+<p>這個大改版讓這些舊的程式都沒法再使用，所以我就跳下去看 Eventlet 來改他舊的程式，好讓他可以支援目前的 Eventlet。這時候新的Snort Integration就誕生啦！</p>
+<p>回到正題，剛剛有提到 Snort 在發現遭受攻擊的時候，會提出警告訊息（Alert message）你可以選擇將這些訊息記錄在 log 檔、 console 上顯示或是把訊息輸出到 Unix Domain Socket 上（它是一個 client）。那我就參照之前就的那份 source code 去做，在 Ryu 上開一個 Unix Domain Socket的Server 這樣就能聽到 Snort 的警告訊息，最後在把它寫成一個 Event 讓它可以在 Application 上透過寫 event handler 的方式去把 alert message 的資訊顯示出來。</p>
+<p>那我們來看一下，在同一檯機器上的時候 Snort 跟 Ryu 的架構圖：</p>
+<p><img src="http://user-image.logdown.io/user/3997/blog/4047/post/221103/fm8tvM7ESQiNz8ivn4Kw_workflow01.png" alt="workflow01.png"></p>
+<p>最終是完成了，但是人總是貪心的，或許我們能在上面再多做一些 feature?</p>
+<p>就有人說啦，把 Snort 跟 Ryu 跑在同一檯機器上， Snort 需要拆解網路封包去判斷是否俱有惡意行為，那麼吃效能會影響 Controller 的。我就在思考要把 Snort 跟 Ryu 拆開的可行辦法，最後找出一個解決方案，在不需要動 Snort 的 source code 之下，我們讓 Snort 那檯機器多跑一隻程式可以接 Unix Domain Socket 的資料再把他往 Network Socket 打出去就能跟 Ryu 接上，所以我又在 Ryu 那邊加入了一個開啓 Network socket Server 這就是讓我們可以把 Snort 跟 Ryu 分開中間的橋樑。</p>
+<p>後來的改版，將 Snort 跟 Ryu 分開機器後的架構圖：</p>
+<p><img src="http://user-image.logdown.io/user/3997/blog/4047/post/221103/YEqEJWpTjavTmzT176AF_workflow02.png" alt="workflow02.png"></p>
+<p>以上這兩種模式，我都有實作進去 Ryu ，由應用程式開發者自己決定要選擇哪一個模式，只要記得把 Configure 設好就能選擇你要使用哪一種模式。</p>
+<p>詳細的文件資料可以參考：<a href="http://ryu.readthedocs.org/en/latest/snort_integrate.html" target="_blank" rel="external">Snort Integration</a> 或是 ryu source code 目錄底下的 <code>ryu/doc/snort_integrate.rst</code></p>
+<h3 id="Simple_switch_with_snort">Simple switch with snort</h3><hr>
+<p>為了怕大家不太熟悉怎麼樣用這個 lib 就在 sample app 裡面加入了一隻簡單的範例程式<code>simple_switch_snort.py</code> ，這個程式除了可以做 L2 Switch 還可以把封包 mirror 給 Snort 。當 Ryu 收到 Alert message 的時候就把 Alert message 顯示出來，當然包括攻擊者的 5-Tuple 有了這些資訊，我們就能在 Controller 那端 Block 掉惡意的來源！</p>
+<h3 id="About_Contribution">About Contribution</h3><hr>
+<p>會寫這段的原因是一開始也不懂得怎麼加 Patch 後來看到 <a href="http://osrg.github.io/ryu-book/en/html/" target="_blank" rel="external">Ryubook</a> 上的 [Contribution section] (<a href="http://osrg.github.io/ryu-book/en/html/contribute.html#sending-a-patch)有記錄，就稍微描述一下讓想要加" target="_blank" rel="external">http://osrg.github.io/ryu-book/en/html/contribute.html#sending-a-patch)有記錄，就稍微描述一下讓想要加</a> Patch 的朋友可以做一個參考。</p>
+<p>Ryu 雖然把 Source Code 放在 GitHub 但不太一樣的是他不能做 Pull Request 他希望所有開發者能夠遞交 Patch 到他們的 Mailing List 上，這種方式跟 Linux kernel 的開發方式一樣，遞交 patch 需要來一個你的Signed-off 然後他們如果 accept 的話，就能夠收錄進官方的 Ryu Project.</p>
+<p>我們可以使用 Git 來產生 Patch 然後對方接到這個 Patch 後，覺得滿意的話，他可以透過 <code>git am</code> 指令把 patch merge進去，可以參考以下步驟遞交 Patch：</p>
+<ul>
+<li><p>當你做完 source code 的變更後，我們通常會 Commit 寫一段你所做的變更的歷史記錄。</p>
+  <figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$ </span>git add sample.py</span><br><span class="line"><span class="variable">$ </span>git commit -m <span class="string">"Add sample application"</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>接下來利用 Git 產生 Patch, 別忘了 <code>-s</code> 是簽名哦！他會去 <code>.gitconfig</code> 拿你的名字跟 email 放在 patch 的後面</p>
+  <figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git <span class="keyword">format</span>-patch origin -<span class="literal">s</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>寄出你的 Patch 到 Mailing List 上。可以不加 <code>-to</code> 的選項 Git 會自動問你要寄給誰？ </p>
+  <figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git send-email <span class="number">0001</span>-sample<span class="class">.patch</span> -to ryu-devel@lists<span class="class">.sourceforge</span><span class="class">.net</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>靜待回音囉！通常還蠻快速的，這份 patch 會有你的簽名，未來如果有人有疑問或是發現 Bug 記得要修啊！</p>
+</li>
+</ul>
+
+        
+            
+        
+    </div>
+    <div class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/OpenFlow/">OpenFlow</a> <a class="tag tag--primary tag--small t-link" href="/tags/Ryu/">Ryu</a> <a class="tag tag--primary tag--small t-link" href="/tags/Snort/">Snort</a>
+
+            </div>
+        
+        <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2014/12/27/snort-rules-generator/"  data-tooltip="Snort Rules Generator">
+                
+                    <i class="fa fa-angle-left"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2014/08/17/Install-Snort-from-source-on-Ubuntu/" data-tooltip="Install Snort from source on Ubuntu">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://linton.tw/2014/09/03/Ryu-with-Snort-Integration/">
+                <i class="fa fa-google-plus"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://linton.tw/2014/09/03/Ryu-with-Snort-Integration/">
+                <i class="fa fa-facebook-official"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://linton.tw/2014/09/03/Ryu-with-Snort-Integration/">
+                <i class="fa fa-twitter"></i>
+            </a>
+        </li>
+        
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                    <i class="fa fa-comment-o"></i>
+                </a>
+            </li>
+        
+    </ul>
+</div>
+
+
+        
+            <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2015 John Lin. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div class="post-bottom-bar">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2014/12/27/snort-rules-generator/"  data-tooltip="Snort Rules Generator">
+                
+                    <i class="fa fa-angle-left"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2014/08/17/Install-Snort-from-source-on-Ubuntu/" data-tooltip="Install Snort from source on Ubuntu">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://linton.tw/2014/09/03/Ryu-with-Snort-Integration/">
+                <i class="fa fa-google-plus"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://linton.tw/2014/09/03/Ryu-with-Snort-Integration/">
+                <i class="fa fa-facebook-official"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://linton.tw/2014/09/03/Ryu-with-Snort-Integration/">
+                <i class="fa fa-twitter"></i>
+            </a>
+        </li>
+        
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                    <i class="fa fa-comment-o"></i>
+                </a>
+            </li>
+        
+    </ul>
+</div>
+
+
+                </div>
+            
+        </div>
+        <div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-remove"></i>
+        </div>
+        
+            <img id="about-card-picture" src="http://www.gravatar.com/avatar/98b5759510e487ade4145247bc856366?s=110"/>
+        
+            <h4 id="about-card-name">John Lin</h4>
+        
+            <h5 id="about-card-bio">I&#39;m very enthusiastic about Open Source projects and passionate about Python and Node.js!</h5>
+        
+        
+            <h5 id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                Software developer
+            </h5>
+        
+        
+            <h5 id="about-card-location">
+                <i class="fa fa-map-marker"></i>
+                <br/>
+                Taipei, Taiwan
+            </h5>
+        
+    </div>
+</div>
+        <div id="cover" style="background-image:url('/assets/images/cover.png');"></div>
+    </body>
+    <!--SCRIPTS-->
+<script src="/assets/js/script.min.js" type="text/javascript"></script>
+<!--SCRIPTS END-->
+
+    <script type="text/javascript">
+        var disqus_shortname = 'lintontw';
+        (function() {
+            var dsq = document.createElement('script');
+            dsq.type = 'text/javascript';
+            dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+
+
+</html>

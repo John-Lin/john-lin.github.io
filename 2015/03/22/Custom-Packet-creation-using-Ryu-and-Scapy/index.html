@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html>
+    
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="John&#39;s Lin Blog">
+    <title>Custom packet creation using Ryu and Scapy - John&#39;s Lin Blog</title>
+    <meta name="author" content="John Lin">
+    <meta name="description" content="John&#39;s Lin Blog">
+    <link rel="icon" href="/assets/images/favicon.ico">
+    
+        <link rel="alternative" type="application/atom+xml" title="RSS" href="atom.xml">
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style.min.css" type="text/css">
+    <!--STYLES END-->
+    
+    <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-47712773-1']);
+        _gaq.push(['_trackPageview']);
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+
+</head>
+
+    <body>
+        <div id="blog">
+            <header id="header">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars "></i>
+    <h1 class="header-title">
+        <a class="header-title-link" href="http://linton.tw">John&#39;s Lin Blog</a>
+    </h1>
+    
+        <a class="header-picture-link" href="/#about">
+            <img class="header-picture" src="http://www.gravatar.com/avatar/98b5759510e487ade4145247bc856366?s=90"/>
+        </a>
+    
+</header>
+            <nav id="sidebar">
+    
+        <div class="sidebar-profile">
+            <a href="/#about">
+                
+                    <img class="sidebar-profile-picture" src="http://www.gravatar.com/avatar/98b5759510e487ade4145247bc856366?s=90"/>
+                
+            </a>
+            <span class="sidebar-profile-name hide-md">John Lin</span>
+        </div>
+    
+    
+        <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+                        <span class="sidebar-button-desc hide-md">Home</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/all-categories">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+                        <span class="sidebar-button-desc hide-md">Categories</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/all-tags">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+                        <span class="sidebar-button-desc hide-md">Tags</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/all-archives">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+                        <span class="sidebar-button-desc hide-md">Archives</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/#about">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+                        <span class="sidebar-button-desc hide-md">About me</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://m103.nthu.edu.tw/~s103064502/" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-file-text"></i>
+                        <span class="sidebar-button-desc hide-md">Résumé</span>
+                    </a>
+                </li>
+            
+        </ul>
+    
+        <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="https://github.com/John-Lin/" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+                        <span class="sidebar-button-desc hide-md">GitHub</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="https://twitter.com/Linton_tw" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-twitter"></i>
+                        <span class="sidebar-button-desc hide-md">Twitter</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="mailto://linton.tw@gmail.com" target="_blank">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-envelope-o"></i>
+                        <span class="sidebar-button-desc hide-md">Mail</span>
+                    </a>
+                </li>
+            
+        </ul>
+    
+        <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link" href="http://linton.tw/atom.xml">
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+                        <span class="sidebar-button-desc hide-md">RSS</span>
+                    </a>
+                </li>
+            
+        </ul>
+    
+</nav>
+            <div id="main">
+                
+<article class="post" itemscope itemType="http://schema.org/BlogPosting">
+    
+        <div class="post-header main-content-wrap">
+    
+        <h1 class="post-title" itemprop="headline">Custom packet creation using Ryu and Scapy</h1>
+    
+    <div class="post-meta">
+    <time  itemprop="datePublished" content="Sun Mar 22 2015 01:02:18 GMT+0800">
+        Mar 22, 2015
+    </time>
+    
+</div>
+</div>
+    
+    <div class="post-content markdown main-content-wrap" itemprop="articleBody">
+        <p>最近在 Ryu 的 <a href="http://sourceforge.net/p/ryu/mailman/message/33611168/" target="_blank" rel="external">mailing list</a> 上看到這個問題，就順便分享一下如何在 Ryu Controller 下製造一個客製化封包傳給 OpenFlow Switch (device)</p>
+<h3 id="應用情境">應用情境</h3><p>假設你在 Controller 收到某個封包之後又或是在某個條件下，需要先產生一個封包並且使用 OpenFlow 的 Packet-Out message 傳給 Switch</p>
+<p>這裏有兩種方法，分別是利用 Ryu 與 Scapy 皆可以產生客製化封包，以下提供你參考<br><a id="more"></a></p>
+<h3 id="Ryu_Framework">Ryu Framework</h3><p>幾個步驟需要注意：</p>
+<ol>
+<li>利用 <code>ryu.lib.packet.packet.Packet</code> 產生一個物件 pkt</li>
+<li>利用 <code>pkt.add_protocol()</code> 堆疊各種網路協定像是(ethernet, ipv4, tcp)，並把每一層需要填入的資訊塞進去</li>
+<li>最後用 <code>pkt.serialize()</code> 包裝封包，checksum 會在這時候算好不用擔心</li>
+<li><code>pkt.data</code> 就會是整個封包的 Binary</li>
+<li>要確認有沒有把封包打包完整，可以用 pcaplib 存成 pcap 檔，可以用 Wireshark 做確認<br>pcaplib 是我之前寫的 patch 現在已經收錄進 Ryu project 使用方式可以參考之前寫這篇 <a href="http://linton.tw/2015/01/26/saving-captured-packets-in-ryu-controller/">Saving captured packets in Ryu controller</a></li>
+</ol>
+<figure class="highlight python"><figcaption><span>build_pkt_ryu.py</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> ryu.lib.packet <span class="keyword">import</span> packet</span><br><span class="line"><span class="keyword">from</span> ryu.lib.packet <span class="keyword">import</span> ethernet</span><br><span class="line"><span class="keyword">from</span> ryu.lib.packet <span class="keyword">import</span> ipv4</span><br><span class="line"><span class="keyword">from</span> ryu.lib.packet <span class="keyword">import</span> tcp</span><br><span class="line"><span class="keyword">from</span> ryu.lib <span class="keyword">import</span> pcaplib</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">build_pkt_ryu</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment"># Creat pcap file writer instance</span></span><br><span class="line">    pcap_pen = pcaplib.Writer(open(<span class="string">'pkt_build_from_ryu.pcap'</span>, <span class="string">'wb'</span>))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Creat an empty Packet instance</span></span><br><span class="line">    pkt = packet.Packet()</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Add ethernet protocol with ether type IP protocol and mac addresses</span></span><br><span class="line">    pkt.add_protocol(ethernet.ethernet(ethertype=<span class="string">'0x0800'</span>,</span><br><span class="line">                                       dst=<span class="string">'70:56:81:12:34:56'</span>,</span><br><span class="line">                                       src=<span class="string">'70:56:81:65:43:21'</span>))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment"># Add ipv4 protocol with IP addresses and TCP protocol which is 6</span></span><br><span class="line">    pkt.add_protocol(ipv4.ipv4(dst=<span class="string">'192.168.8.70'</span>,</span><br><span class="line">                               src=<span class="string">'192.168.8.50'</span>,</span><br><span class="line">              	               proto=<span class="number">6</span>))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Add tcp protocol with port numbers and sequence number</span></span><br><span class="line">    pkt.add_protocol(tcp.tcp(src_port=<span class="number">5566</span>,</span><br><span class="line">                             dst_port=<span class="number">8080</span>,</span><br><span class="line">                             seq=<span class="number">1234566</span>))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Packet serializing</span></span><br><span class="line">    pkt.serialize()</span><br><span class="line"></span><br><span class="line">    bin_packet = pkt.data</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Write to pcap file</span></span><br><span class="line">    pcap_pen.write_pkt(bin_packet)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    build_pkt_ryu()</span><br></pre></td></tr></table></figure>
+<h3 id="Scapy_Framework">Scapy Framework</h3><p>這是最簡單的方式作出封包，但是需要安裝 <a href="http://www.secdev.org/projects/scapy/" target="_blank" rel="external">Scapy</a> 的 package</p>
+<p>安裝方法</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo pip <span class="keyword">install</span> scapy</span><br></pre></td></tr></table></figure>
+<p>緊接著來做封包，用了 Scapy 十分容易</p>
+<figure class="highlight python"><figcaption><span>build_pkt_scapy.py</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> ryu.lib <span class="keyword">import</span> pcaplib</span><br><span class="line"><span class="keyword">from</span> scapy.all <span class="keyword">import</span> Ether, IP, TCP</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">build_pkt_scapy</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment"># Creat pcap file writer instance</span></span><br><span class="line">    pcap_pen = pcaplib.Writer(open(<span class="string">'pkt_build_from_scapy.pcap'</span>, <span class="string">'wb'</span>))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    eth = Ether(src=<span class="string">'70:56:81:12:34:56'</span>, dst=<span class="string">'84:94:56:12:34:44'</span>)</span><br><span class="line"></span><br><span class="line">    ip = IP(src=<span class="string">'192.168.8.70'</span>, dst=<span class="string">'192.168.8.50'</span>)</span><br><span class="line"></span><br><span class="line">    tcp_rst = TCP(sport= <span class="number">5566</span>, dport=<span class="number">8080</span>, seq= <span class="number">1234566</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Combine</span></span><br><span class="line">    pkt = eth/ip/tcp_rst</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Write to pcap file</span></span><br><span class="line">    pcap_pen.write_pkt(pkt)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    build_pkt_scapy()</span><br></pre></td></tr></table></figure>
+<p>以上兩種方法皆可以做出封包，並且輕易的存成 PCAP file 讓你用 Wireshark 去檢查是不是有問題，所以好 Ryu 不用嗎? XD</p>
+
+        
+            
+        
+    </div>
+    <div class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/OpenFlow/">OpenFlow</a> <a class="tag tag--primary tag--small t-link" href="/tags/Ryu/">Ryu</a> <a class="tag tag--primary tag--small t-link" href="/tags/SDN/">SDN</a> <a class="tag tag--primary tag--small t-link" href="/tags/Scapy/">Scapy</a>
+
+            </div>
+        
+        <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2015/06/03/Python-Cookbook-Remark/"  data-tooltip="Python Cookbook Remark">
+                
+                    <i class="fa fa-angle-left"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2015/02/18/An-install-script-and-guide-for-Ryu/" data-tooltip="An install script and guide for Ryu">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://linton.tw/2015/03/22/Custom-Packet-creation-using-Ryu-and-Scapy/">
+                <i class="fa fa-google-plus"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://linton.tw/2015/03/22/Custom-Packet-creation-using-Ryu-and-Scapy/">
+                <i class="fa fa-facebook-official"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://linton.tw/2015/03/22/Custom-Packet-creation-using-Ryu-and-Scapy/">
+                <i class="fa fa-twitter"></i>
+            </a>
+        </li>
+        
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                    <i class="fa fa-comment-o"></i>
+                </a>
+            </li>
+        
+    </ul>
+</div>
+
+
+        
+            <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2015 John Lin. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div class="post-bottom-bar">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2015/06/03/Python-Cookbook-Remark/"  data-tooltip="Python Cookbook Remark">
+                
+                    <i class="fa fa-angle-left"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2015/02/18/An-install-script-and-guide-for-Ryu/" data-tooltip="An install script and guide for Ryu">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://linton.tw/2015/03/22/Custom-Packet-creation-using-Ryu-and-Scapy/">
+                <i class="fa fa-google-plus"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://linton.tw/2015/03/22/Custom-Packet-creation-using-Ryu-and-Scapy/">
+                <i class="fa fa-facebook-official"></i>
+            </a>
+        </li>
+        <li class="post-action">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://linton.tw/2015/03/22/Custom-Packet-creation-using-Ryu-and-Scapy/">
+                <i class="fa fa-twitter"></i>
+            </a>
+        </li>
+        
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                    <i class="fa fa-comment-o"></i>
+                </a>
+            </li>
+        
+    </ul>
+</div>
+
+
+                </div>
+            
+        </div>
+        <div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-remove"></i>
+        </div>
+        
+            <img id="about-card-picture" src="http://www.gravatar.com/avatar/98b5759510e487ade4145247bc856366?s=110"/>
+        
+            <h4 id="about-card-name">John Lin</h4>
+        
+            <h5 id="about-card-bio">I&#39;m very enthusiastic about Open Source projects and passionate about Python and Node.js!</h5>
+        
+        
+            <h5 id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                Software developer
+            </h5>
+        
+        
+            <h5 id="about-card-location">
+                <i class="fa fa-map-marker"></i>
+                <br/>
+                Taipei, Taiwan
+            </h5>
+        
+    </div>
+</div>
+        <div id="cover" style="background-image:url('/assets/images/cover.png');"></div>
+    </body>
+    <!--SCRIPTS-->
+<script src="/assets/js/script.min.js" type="text/javascript"></script>
+<!--SCRIPTS END-->
+
+    <script type="text/javascript">
+        var disqus_shortname = 'lintontw';
+        (function() {
+            var dsq = document.createElement('script');
+            dsq.type = 'text/javascript';
+            dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+
+
+</html>

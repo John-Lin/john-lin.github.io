@@ -2,6 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://linton.tw/2015/06/03/Python-Cookbook-Remark/</loc>
+    <lastmod>2015-06-03T15:19:12.000Z</lastmod>
+  </url>
+  
+  <url>
     <loc>http://linton.tw/all-archives/index.html</loc>
     <lastmod>2015-05-30T17:41:36.000Z</lastmod>
   </url>
@@ -22,137 +27,137 @@
   </url>
   
   <url>
-    <loc>http://linton.tw/2015/02/18/2015-02-18-An-install-script-and-guide-for-Ryu/</loc>
+    <loc>http://linton.tw/2015/02/18/An-install-script-and-guide-for-Ryu/</loc>
     <lastmod>2015-04-26T18:00:46.000Z</lastmod>
   </url>
   
   <url>
-    <loc>http://linton.tw/2015/03/22/2015-03-22-Custom-Packet-creation-using-Ryu-and-Scapy/</loc>
+    <loc>http://linton.tw/2015/03/22/Custom-Packet-creation-using-Ryu-and-Scapy/</loc>
     <lastmod>2015-03-21T18:11:02.000Z</lastmod>
   </url>
   
   <url>
-    <loc>http://linton.tw/2015/01/26/2015-01-26-saving-captured-packets-in-ryu-controller/</loc>
+    <loc>http://linton.tw/2015/01/26/saving-captured-packets-in-ryu-controller/</loc>
     <lastmod>2015-02-03T16:13:24.000Z</lastmod>
   </url>
   
   <url>
-    <loc>http://linton.tw/2014/12/27/2014-12-27-snort-rules-generator/</loc>
+    <loc>http://linton.tw/2014/12/27/snort-rules-generator/</loc>
     <lastmod>2014-12-30T01:48:36.000Z</lastmod>
   </url>
   
   <url>
-    <loc>http://linton.tw/2014/01/11/2014-01-11-install-ryu-3-5-sdn-framework/</loc>
+    <loc>http://linton.tw/2014/01/31/bug-office-for-mac-2011-shortcuts-fail/</loc>
     <lastmod>2014-12-30T01:39:15.000Z</lastmod>
   </url>
   
   <url>
-    <loc>http://linton.tw/2014/07/06/2014-07-06-beijing-college-student-it-camp-university-of-posts-and-telecommunications/</loc>
+    <loc>http://linton.tw/2014/07/06/beijing-college-student-it-camp-university-of-posts-and-telecommunications/</loc>
     <lastmod>2014-12-30T01:39:15.000Z</lastmod>
   </url>
   
   <url>
-    <loc>http://linton.tw/2014/05/15/2014-05-15-learned-how-to-develop-sdn-openflow-applications/</loc>
+    <loc>http://linton.tw/2014/05/15/learned-how-to-develop-sdn-openflow-applications/</loc>
     <lastmod>2014-12-30T01:39:15.000Z</lastmod>
   </url>
   
   <url>
-    <loc>http://linton.tw/2014/05/13/2014-05-13-openflow-13-for-openwrt-on-tl-1043nd-with-open-vswitch/</loc>
+    <loc>http://linton.tw/2014/05/13/openflow-13-for-openwrt-on-tl-1043nd-with-open-vswitch/</loc>
     <lastmod>2014-12-30T01:39:15.000Z</lastmod>
   </url>
   
   <url>
-    <loc>http://linton.tw/2014/05/04/2014-05-04-share-my-vim-configuration-file/</loc>
+    <loc>http://linton.tw/2014/05/04/share-my-vim-configuration-file/</loc>
     <lastmod>2014-12-30T01:39:15.000Z</lastmod>
   </url>
   
   <url>
-    <loc>http://linton.tw/2014/03/19/2014-03-19-using-yahoo-finance-api-amazon-ec2-subscription-on-exchange-rates/</loc>
+    <loc>http://linton.tw/2014/03/19/using-yahoo-finance-api-amazon-ec2-subscription-on-exchange-rates/</loc>
     <lastmod>2014-12-30T01:39:15.000Z</lastmod>
   </url>
   
   <url>
-    <loc>http://linton.tw/2014/02/15/2014-02-15-note-install-ryu-36-sdn-framework/</loc>
+    <loc>http://linton.tw/2014/02/15/note-install-ryu-36-sdn-framework/</loc>
     <lastmod>2014-12-30T01:39:15.000Z</lastmod>
   </url>
   
   <url>
-    <loc>http://linton.tw/2014/08/17/2014-08-17-Install-Snort-from-source-on-Ubuntu/</loc>
+    <loc>http://linton.tw/2014/09/03/Ryu-with-Snort-Integration/</loc>
     <lastmod>2014-12-30T01:39:15.000Z</lastmod>
   </url>
   
   <url>
-    <loc>http://linton.tw/2014/02/09/2014-02-09-note-ryu-controller-app-dumb-layer-2-switch/</loc>
+    <loc>http://linton.tw/2014/02/09/note-ryu-controller-app-dumb-layer-2-switch/</loc>
     <lastmod>2014-12-30T01:39:15.000Z</lastmod>
   </url>
   
   <url>
-    <loc>http://linton.tw/2014/01/31/2014-01-31-bug-office-for-mac-2011-shortcuts-fail/</loc>
+    <loc>http://linton.tw/2014/08/17/Install-Snort-from-source-on-Ubuntu/</loc>
     <lastmod>2014-12-30T01:39:15.000Z</lastmod>
   </url>
   
   <url>
-    <loc>http://linton.tw/2014/08/08/2014-08-08-My-first-time-using-hexo/</loc>
+    <loc>http://linton.tw/2014/01/11/install-ryu-3-5-sdn-framework/</loc>
     <lastmod>2014-12-30T01:39:15.000Z</lastmod>
   </url>
   
   <url>
-    <loc>http://linton.tw/2013/12/03/2013-12-03-raspberry-pi-x-sht15-humidity-detection/</loc>
+    <loc>http://linton.tw/2013/12/03/raspberry-pi-x-sht15-humidity-detection/</loc>
     <lastmod>2014-12-30T01:39:15.000Z</lastmod>
   </url>
   
   <url>
-    <loc>http://linton.tw/2013/11/28/2013-11-28-synology-ds214-right-out-of-the-box-software-review/</loc>
+    <loc>http://linton.tw/2013/11/28/synology-ds214-right-out-of-the-box-software-review/</loc>
     <lastmod>2014-12-30T01:39:15.000Z</lastmod>
   </url>
   
   <url>
-    <loc>http://linton.tw/2013/11/27/2013-11-27-synology-ds214-right-out-of-the-box/</loc>
+    <loc>http://linton.tw/2013/11/27/synology-ds214-right-out-of-the-box/</loc>
     <lastmod>2014-12-30T01:39:15.000Z</lastmod>
   </url>
   
   <url>
-    <loc>http://linton.tw/2013/10/18/2013-10-18-scapy-network-packet-analysis-tool/</loc>
+    <loc>http://linton.tw/2013/10/18/scapy-network-packet-analysis-tool/</loc>
     <lastmod>2014-12-30T01:39:15.000Z</lastmod>
   </url>
   
   <url>
-    <loc>http://linton.tw/2013/10/13/2013-10-13-help-to-compile-java-source-code-graphical-interface/</loc>
+    <loc>http://linton.tw/2013/10/13/help-to-compile-java-source-code-graphical-interface/</loc>
     <lastmod>2014-12-30T01:39:15.000Z</lastmod>
   </url>
   
   <url>
-    <loc>http://linton.tw/2013/10/08/2013-10-08-introduction-to-working-with-pyinstaller20/</loc>
+    <loc>http://linton.tw/2013/10/08/introduction-to-working-with-pyinstaller20/</loc>
     <lastmod>2014-12-30T01:39:15.000Z</lastmod>
   </url>
   
   <url>
-    <loc>http://linton.tw/2013/09/06/2013-09-06-set-up-linux-mint-15/</loc>
+    <loc>http://linton.tw/2013/09/06/set-up-linux-mint-15/</loc>
     <lastmod>2014-12-30T01:39:15.000Z</lastmod>
   </url>
   
   <url>
-    <loc>http://linton.tw/2013/09/06/2013-09-06-pick-photo-utility/</loc>
+    <loc>http://linton.tw/2013/09/06/pick-photo-utility/</loc>
     <lastmod>2014-12-30T01:39:15.000Z</lastmod>
   </url>
   
   <url>
-    <loc>http://linton.tw/2014/09/03/2014-09-03-Ryu-with-Snort-Integration/</loc>
+    <loc>http://linton.tw/2014/08/11/NTT-Network-Innovation-Laboratories-SDN-Seminar/</loc>
     <lastmod>2014-12-30T01:39:15.000Z</lastmod>
   </url>
   
   <url>
-    <loc>http://linton.tw/2014/08/11/2014-08-11-NTT-Network-Innovation-Laboratories-SDN-Seminar/</loc>
+    <loc>http://linton.tw/2014/08/08/My-first-time-using-hexo/</loc>
     <lastmod>2014-12-30T01:39:15.000Z</lastmod>
   </url>
   
   <url>
-    <loc>http://linton.tw/2014/07/28/2014-07-28-in-the-mac-os-x-install-aten-mavericks-uc-232a-usb-to-serial-driver/</loc>
+    <loc>http://linton.tw/2014/07/28/in-the-mac-os-x-install-aten-mavericks-uc-232a-usb-to-serial-driver/</loc>
     <lastmod>2014-12-30T01:39:15.000Z</lastmod>
   </url>
   
   <url>
-    <loc>http://linton.tw/2014/02/11/2014-02-11-note-how-to-set-up-ryu-controller-with-gui-component/</loc>
+    <loc>http://linton.tw/2014/02/11/note-how-to-set-up-ryu-controller-with-gui-component/</loc>
     <lastmod>2014-12-30T01:39:15.000Z</lastmod>
   </url>
   

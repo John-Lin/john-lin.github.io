@@ -4,7 +4,7 @@
   <subtitle><![CDATA[Python / OpenFlow / Hack]]></subtitle>
   <link href="/atom.xml" rel="self"/>
   <link href="http://linton.tw/"/>
-  <updated>2015-03-21T18:11:02.000Z</updated>
+  <updated>2015-06-03T15:19:12.000Z</updated>
   <id>http://linton.tw/</id>
   
   <author>
@@ -15,9 +15,36 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title><![CDATA[Python Cookbook Remark]]></title>
+    <link href="http://linton.tw/2015/06/03/Python-Cookbook-Remark/"/>
+    <id>http://linton.tw/2015/06/03/Python-Cookbook-Remark/</id>
+    <published>2015-06-03T15:13:31.000Z</published>
+    <updated>2015-06-03T15:19:12.000Z</updated>
+    <content type="html"><![CDATA[<p>最近閱讀 Python Cookbook 錦囊妙計，發現有很多非常有用的方法能讓 python code 變得非常簡潔優雅，分享一下一些使用的情境與使用方法。</p>
+<a id="more"></a>
+<h2 id="欲解決的問題：">欲解決的問題：</h2><p>想要製作一個 dictionary 它會將各個 keys 對應到一個以上的值。</p>
+<h2 id="解決方法：">解決方法：</h2><p>遇到這個問題，一般初學者直覺的想法，可能會製作一個類似這樣的一個 dictionary</p>
+<figure class="highlight python"><figcaption><span>defaultdict1.py</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">d = &#123;</span><br><span class="line">    <span class="string">'John'</span>:[<span class="number">5</span>, <span class="number">10</span>, <span class="number">15</span>, <span class="number">20</span>],</span><br><span class="line">    <span class="string">'Henry'</span>:[<span class="number">4</span>, <span class="number">8</span>, <span class="number">12</span>, <span class="number">16</span>, <span class="number">20</span>],</span><br><span class="line">    <span class="string">'Cindy'</span>:[<span class="number">10</span>, <span class="number">20</span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>因為我們需要更靈活的運用 dictionary 不單單只是把 dictionary 初始化放在那裡，我們可能需要動態地增加資料進去 list 稍微資深一點可能就會考慮使用 <code>setdefault</code> 像以下這種做法</p>
+<figure class="highlight python"><figcaption><span>defaultdict2.py</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">d = &#123;&#125;</span><br><span class="line">d.setdefault(<span class="string">'John'</span>, []).append(<span class="number">25</span>)</span><br><span class="line">d.setdefault(<span class="string">'John'</span>, []).append(<span class="number">30</span>)</span><br><span class="line"></span><br><span class="line">d.setdefault(<span class="string">'Henry'</span>, []).append(<span class="number">24</span>)</span><br><span class="line"></span><br><span class="line">d.setdefault(<span class="string">'Cindy'</span>, []).append(<span class="number">30</span>)</span><br></pre></td></tr></table></figure>
+<p>然而， <code>setdefault</code> 運用起來並沒有沒那麼直覺，每次建立時總是會初始化一個 instance 例如範例的 <code>[]</code></p>
+<p>這裏提供了一個更為簡潔的方法能夠輕鬆的地構建這種 dictionary 透過使用 collections 模組中的 defaultdict</p>
+<figure class="highlight python"><figcaption><span>defaultdict2.py</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> defaultdict</span><br><span class="line"></span><br><span class="line">d = defaultdict(list)</span><br><span class="line">d[<span class="string">'John'</span>].append(<span class="number">60</span>)</span><br><span class="line">d[<span class="string">'John'</span>].append(<span class="number">55</span>)</span><br><span class="line"></span><br><span class="line">d[<span class="string">'Henry'</span>].append(<span class="number">32</span>)</span><br><span class="line"></span><br><span class="line">d[<span class="string">'Cindy'</span>].append(<span class="number">40</span>)</span><br></pre></td></tr></table></figure>
+<p>這樣一來看起來輕鬆許多， <code>collections.defaultdict</code> 會自動為之後被存取的 key 建立 dictionary entries 即便目前在字典中找不到它們也是一樣。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>最近閱讀 Python Cookbook 錦囊妙計，發現有很多非常有用的方法能讓 python code 變得非常簡潔優雅，分享一下一些使用的情境與使用方法。</p>]]>
+    
+    </summary>
+    
+      <category term="Python" scheme="http://linton.tw/tags/Python/"/>
+    
+  </entry>
+  
+  <entry>
     <title><![CDATA[Custom packet creation using Ryu and Scapy]]></title>
-    <link href="http://linton.tw/2015/03/22/2015-03-22-Custom-Packet-creation-using-Ryu-and-Scapy/"/>
-    <id>http://linton.tw/2015/03/22/2015-03-22-Custom-Packet-creation-using-Ryu-and-Scapy/</id>
+    <link href="http://linton.tw/2015/03/22/Custom-Packet-creation-using-Ryu-and-Scapy/"/>
+    <id>http://linton.tw/2015/03/22/Custom-Packet-creation-using-Ryu-and-Scapy/</id>
     <published>2015-03-21T17:02:18.000Z</published>
     <updated>2015-03-21T18:11:02.000Z</updated>
     <content type="html"><![CDATA[<p>最近在 Ryu 的 <a href="http://sourceforge.net/p/ryu/mailman/message/33611168/" target="_blank" rel="external">mailing list</a> 上看到這個問題，就順便分享一下如何在 Ryu Controller 下製造一個客製化封包傳給 OpenFlow Switch (device)</p>
@@ -58,8 +85,8 @@
   
   <entry>
     <title><![CDATA[An install script and guide for Ryu]]></title>
-    <link href="http://linton.tw/2015/02/18/2015-02-18-An-install-script-and-guide-for-Ryu/"/>
-    <id>http://linton.tw/2015/02/18/2015-02-18-An-install-script-and-guide-for-Ryu/</id>
+    <link href="http://linton.tw/2015/02/18/An-install-script-and-guide-for-Ryu/"/>
+    <id>http://linton.tw/2015/02/18/An-install-script-and-guide-for-Ryu/</id>
     <published>2015-02-17T16:58:05.000Z</published>
     <updated>2015-04-26T18:00:46.000Z</updated>
     <content type="html"><![CDATA[<p><img src="http://i.minus.com/iYGeioze8zEyS.png" alt="scripts"></p>
@@ -87,8 +114,8 @@
   
   <entry>
     <title><![CDATA[Saving captured packets in Ryu controller]]></title>
-    <link href="http://linton.tw/2015/01/26/2015-01-26-saving-captured-packets-in-ryu-controller/"/>
-    <id>http://linton.tw/2015/01/26/2015-01-26-saving-captured-packets-in-ryu-controller/</id>
+    <link href="http://linton.tw/2015/01/26/saving-captured-packets-in-ryu-controller/"/>
+    <id>http://linton.tw/2015/01/26/saving-captured-packets-in-ryu-controller/</id>
     <published>2015-01-26T08:15:14.000Z</published>
     <updated>2015-02-03T16:13:24.000Z</updated>
     <content type="html"><![CDATA[<p><img src="http://i2.minus.com/igLpHeXPT7LFt.png" alt="pcap"></p>
@@ -125,8 +152,8 @@
   
   <entry>
     <title><![CDATA[Snort Rules Generator]]></title>
-    <link href="http://linton.tw/2014/12/27/2014-12-27-snort-rules-generator/"/>
-    <id>http://linton.tw/2014/12/27/2014-12-27-snort-rules-generator/</id>
+    <link href="http://linton.tw/2014/12/27/snort-rules-generator/"/>
+    <id>http://linton.tw/2014/12/27/snort-rules-generator/</id>
     <published>2014-12-27T15:44:14.000Z</published>
     <updated>2014-12-30T01:48:36.000Z</updated>
     <content type="html"><![CDATA[<h3 id="前言">前言</h3><p>好久沒有寫文章了，最近研究的主題是網路安全，在這方面做了一個專案。雖然原本期望是在兩年研究所時間都是投入在 SDN 的應用程式開發，但是人生總是會有一些意想不到的意外。</p>
@@ -161,7 +188,7 @@
 <p>分析網路封包與產生 Snort Rules 解封包重組 Payload 用 <a href="https://code.google.com/p/dpkt/" target="_blank" rel="external">Dpkt</a> 判斷惡意或善意連線需要有一個 Knowledge Base 依靠的是 <a href="https://www.virustotal.com/" target="_blank" rel="external">VirusTotal</a> 所提供的 API 這邊我有去申請 Private 的 API 每分鐘能發 300 個 requests 相較於 Public API 每分鐘 4 個 requests 是天差地遠！</p>
 <p>我想徵招興趣的朋友一起來做專案都在 Github 上！</p>
 <p><a href="https://github.com/John-Lin/malware" target="_blank" rel="external">https://github.com/John-Lin/malware</a></p>
-<p>對此專案有興趣，或想加入一起開發的朋友可以來信 <a href="&#x6d;&#97;&#105;&#x6c;&#116;&#111;&#x3a;&#108;&#105;&#x6e;&#x74;&#111;&#110;&#46;&#x74;&#119;&#64;&#103;&#x6d;&#x61;&#105;&#x6c;&#46;&#x63;&#x6f;&#x6d;">&#108;&#105;&#x6e;&#x74;&#111;&#110;&#46;&#x74;&#119;&#64;&#103;&#x6d;&#x61;&#105;&#x6c;&#46;&#x63;&#x6f;&#x6d;</a></p>
+<p>對此專案有興趣，或想加入一起開發的朋友可以來信 <a href="&#109;&#97;&#x69;&#108;&#x74;&#x6f;&#x3a;&#108;&#105;&#110;&#116;&#111;&#x6e;&#46;&#x74;&#119;&#64;&#x67;&#109;&#x61;&#105;&#108;&#x2e;&#x63;&#111;&#x6d;">&#108;&#105;&#110;&#116;&#111;&#x6e;&#46;&#x74;&#119;&#64;&#x67;&#109;&#x61;&#105;&#108;&#x2e;&#x63;&#111;&#x6d;</a></p>
 <p>目前有幾項功能想要增加：</p>
 <ul>
 <li><p>產生非 HTTP Protocol 的規則 （沒錯！除 UDP 的規則目前尚在開發中， TCP 的 case 我目前只有針對 HTTP Protocol 產生的規則，因為 Windows 防火牆預設都把其他 port 關了，我就錄不到其他 port 的連線！）</p>
@@ -194,8 +221,8 @@
   
   <entry>
     <title><![CDATA[Ryu with Snort Integration]]></title>
-    <link href="http://linton.tw/2014/09/03/2014-09-03-Ryu-with-Snort-Integration/"/>
-    <id>http://linton.tw/2014/09/03/2014-09-03-Ryu-with-Snort-Integration/</id>
+    <link href="http://linton.tw/2014/09/03/Ryu-with-Snort-Integration/"/>
+    <id>http://linton.tw/2014/09/03/Ryu-with-Snort-Integration/</id>
     <published>2014-09-02T17:03:34.000Z</published>
     <updated>2014-12-30T01:39:15.000Z</updated>
     <content type="html"><![CDATA[<p><img src="http://user-image.logdown.io/user/3997/blog/4047/post/221103/QPs7nl8iTnS45kvEo5jz_snort_ryu.png" alt="snort_ryu.png"></p>
@@ -254,8 +281,8 @@
   
   <entry>
     <title><![CDATA[Install Snort from source on Ubuntu]]></title>
-    <link href="http://linton.tw/2014/08/17/2014-08-17-Install-Snort-from-source-on-Ubuntu/"/>
-    <id>http://linton.tw/2014/08/17/2014-08-17-Install-Snort-from-source-on-Ubuntu/</id>
+    <link href="http://linton.tw/2014/08/17/Install-Snort-from-source-on-Ubuntu/"/>
+    <id>http://linton.tw/2014/08/17/Install-Snort-from-source-on-Ubuntu/</id>
     <published>2014-08-16T16:30:45.000Z</published>
     <updated>2014-12-30T01:39:15.000Z</updated>
     <content type="html"><![CDATA[<p>Some installation notes about install snort from source code on Ubuntu 14.04</p>
@@ -333,8 +360,8 @@
   
   <entry>
     <title><![CDATA[NTT 未來網路研究所 SDN 研討會]]></title>
-    <link href="http://linton.tw/2014/08/11/2014-08-11-NTT-Network-Innovation-Laboratories-SDN-Seminar/"/>
-    <id>http://linton.tw/2014/08/11/2014-08-11-NTT-Network-Innovation-Laboratories-SDN-Seminar/</id>
+    <link href="http://linton.tw/2014/08/11/NTT-Network-Innovation-Laboratories-SDN-Seminar/"/>
+    <id>http://linton.tw/2014/08/11/NTT-Network-Innovation-Laboratories-SDN-Seminar/</id>
     <published>2014-08-10T17:29:02.000Z</published>
     <updated>2014-12-30T01:39:15.000Z</updated>
     <content type="html"><![CDATA[<p><a href="https://www.flickr.com/photos/linton-flickr/14691549400" title="NTT_SDN by 哲緯 林, on Flickr" target="_blank" rel="external"><img src="https://farm4.staticflickr.com/3879/14691549400_3c4081057c_z.jpg" width="640" height="478" alt="NTT_SDN"></a></p>
@@ -382,8 +409,8 @@
   
   <entry>
     <title><![CDATA[My first time using hexo]]></title>
-    <link href="http://linton.tw/2014/08/08/2014-08-08-My-first-time-using-hexo/"/>
-    <id>http://linton.tw/2014/08/08/2014-08-08-My-first-time-using-hexo/</id>
+    <link href="http://linton.tw/2014/08/08/My-first-time-using-hexo/"/>
+    <id>http://linton.tw/2014/08/08/My-first-time-using-hexo/</id>
     <published>2014-08-08T08:40:27.000Z</published>
     <updated>2014-12-30T01:39:15.000Z</updated>
     <content type="html"><![CDATA[<p>Hello there, this is my first time using hexo to build my blog!</p>
@@ -407,8 +434,8 @@
   
   <entry>
     <title><![CDATA[在 Mac OS X Mavericks 上安裝 Aten UC-232A USB to Serial 驅動程式]]></title>
-    <link href="http://linton.tw/2014/07/28/2014-07-28-in-the-mac-os-x-install-aten-mavericks-uc-232a-usb-to-serial-driver/"/>
-    <id>http://linton.tw/2014/07/28/2014-07-28-in-the-mac-os-x-install-aten-mavericks-uc-232a-usb-to-serial-driver/</id>
+    <link href="http://linton.tw/2014/07/28/in-the-mac-os-x-install-aten-mavericks-uc-232a-usb-to-serial-driver/"/>
+    <id>http://linton.tw/2014/07/28/in-the-mac-os-x-install-aten-mavericks-uc-232a-usb-to-serial-driver/</id>
     <published>2014-07-28T09:11:00.000Z</published>
     <updated>2014-12-30T01:39:15.000Z</updated>
     <content type="html"><![CDATA[<h3 id="前言">前言</h3><hr>
@@ -463,8 +490,8 @@
   
   <entry>
     <title><![CDATA[ 2014年京台大學生IT交流營【北京郵電大學】]]></title>
-    <link href="http://linton.tw/2014/07/06/2014-07-06-beijing-college-student-it-camp-university-of-posts-and-telecommunications/"/>
-    <id>http://linton.tw/2014/07/06/2014-07-06-beijing-college-student-it-camp-university-of-posts-and-telecommunications/</id>
+    <link href="http://linton.tw/2014/07/06/beijing-college-student-it-camp-university-of-posts-and-telecommunications/"/>
+    <id>http://linton.tw/2014/07/06/beijing-college-student-it-camp-university-of-posts-and-telecommunications/</id>
     <published>2014-07-06T05:43:00.000Z</published>
     <updated>2014-12-30T01:39:15.000Z</updated>
     <content type="html"><![CDATA[<iframe src="https://www.flickr.com/photos/linton-flickr/14549875502/player/685f169332" height="534" width="800" frameborder="0" allowfullscreen webkitallowfullscreen="" mozallowfullscreen="" oallowfullscreen="" msallowfullscreen=""></iframe>
@@ -488,8 +515,8 @@
   
   <entry>
     <title><![CDATA[【心得】如何開發 SDN / OpenFlow 應用程式]]></title>
-    <link href="http://linton.tw/2014/05/15/2014-05-15-learned-how-to-develop-sdn-openflow-applications/"/>
-    <id>http://linton.tw/2014/05/15/2014-05-15-learned-how-to-develop-sdn-openflow-applications/</id>
+    <link href="http://linton.tw/2014/05/15/learned-how-to-develop-sdn-openflow-applications/"/>
+    <id>http://linton.tw/2014/05/15/learned-how-to-develop-sdn-openflow-applications/</id>
     <published>2014-05-15T08:20:00.000Z</published>
     <updated>2014-12-30T01:39:15.000Z</updated>
     <content type="html"><![CDATA[<p><img src="http://user-image.logdown.io/user/3997/blog/4047/post/199222/JqRt3wgTPqHwdeq8zizA_newlogo7.png" alt="newlogo7.png"></p>
@@ -558,8 +585,8 @@
   
   <entry>
     <title><![CDATA[OpenFlow 1.3 for OpenWRT on TL-1043ND with OVS]]></title>
-    <link href="http://linton.tw/2014/05/13/2014-05-13-openflow-13-for-openwrt-on-tl-1043nd-with-open-vswitch/"/>
-    <id>http://linton.tw/2014/05/13/2014-05-13-openflow-13-for-openwrt-on-tl-1043nd-with-open-vswitch/</id>
+    <link href="http://linton.tw/2014/05/13/openflow-13-for-openwrt-on-tl-1043nd-with-open-vswitch/"/>
+    <id>http://linton.tw/2014/05/13/openflow-13-for-openwrt-on-tl-1043nd-with-open-vswitch/</id>
     <published>2014-05-13T08:12:00.000Z</published>
     <updated>2014-12-30T01:39:15.000Z</updated>
     <content type="html"><![CDATA[<h3 id="前言">前言</h3><hr>
@@ -635,8 +662,8 @@
   
   <entry>
     <title><![CDATA[[分享] 我的Vim設定檔]]></title>
-    <link href="http://linton.tw/2014/05/04/2014-05-04-share-my-vim-configuration-file/"/>
-    <id>http://linton.tw/2014/05/04/2014-05-04-share-my-vim-configuration-file/</id>
+    <link href="http://linton.tw/2014/05/04/share-my-vim-configuration-file/"/>
+    <id>http://linton.tw/2014/05/04/share-my-vim-configuration-file/</id>
     <published>2014-05-04T02:28:00.000Z</published>
     <updated>2014-12-30T01:39:15.000Z</updated>
     <content type="html"><![CDATA[<p>最近<a href="https://github.com/gmarik/Vundle.vim" target="_blank" rel="external">Vundle</a>更新了！安裝套件的指令由 <code>:BundleInstall</code> 改為 <code>:PluginInstall</code> </p>
@@ -660,8 +687,8 @@
   
   <entry>
     <title><![CDATA[利用Yahoo Finance API, Amazon EC2訂閱全球匯率]]></title>
-    <link href="http://linton.tw/2014/03/19/2014-03-19-using-yahoo-finance-api-amazon-ec2-subscription-on-exchange-rates/"/>
-    <id>http://linton.tw/2014/03/19/2014-03-19-using-yahoo-finance-api-amazon-ec2-subscription-on-exchange-rates/</id>
+    <link href="http://linton.tw/2014/03/19/using-yahoo-finance-api-amazon-ec2-subscription-on-exchange-rates/"/>
+    <id>http://linton.tw/2014/03/19/using-yahoo-finance-api-amazon-ec2-subscription-on-exchange-rates/</id>
     <published>2014-03-19T07:56:00.000Z</published>
     <updated>2014-12-30T01:39:15.000Z</updated>
     <content type="html"><![CDATA[<h3 id="簡介">簡介</h3><hr>
@@ -700,8 +727,8 @@
   
   <entry>
     <title><![CDATA[[筆記] Install Ryu 3.6 - SDN Framework ]]></title>
-    <link href="http://linton.tw/2014/02/15/2014-02-15-note-install-ryu-36-sdn-framework/"/>
-    <id>http://linton.tw/2014/02/15/2014-02-15-note-install-ryu-36-sdn-framework/</id>
+    <link href="http://linton.tw/2014/02/15/note-install-ryu-36-sdn-framework/"/>
+    <id>http://linton.tw/2014/02/15/note-install-ryu-36-sdn-framework/</id>
     <published>2014-02-14T23:47:00.000Z</published>
     <updated>2014-12-30T01:39:15.000Z</updated>
     <content type="html"><![CDATA[<h2 id="Continue…">Continue…</h2><hr>
@@ -736,7 +763,7 @@
 <figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">linton@linton-virtual-machine ~ $ ryu-manager </span><br><span class="line">loading app ryu<span class="class">.controller</span><span class="class">.ofp_handler</span></span><br><span class="line">instantiating app ryu<span class="class">.controller</span><span class="class">.ofp_handler</span> of OFPHandler</span><br></pre></td></tr></table></figure>
 <h3 id="End…">End…</h3><hr>
 <p>若安裝過程還是有問題，可以寄信給我或是在下面留言與我討論 =)</p>
-<p>十分歡迎有在研究 SDN 的朋友一起討論!!<br>Email Address : <a href="&#x6d;&#x61;&#105;&#x6c;&#x74;&#111;&#58;&#x6c;&#x69;&#110;&#116;&#111;&#x6e;&#64;&#x69;&#x69;&#x69;&#x2e;&#x6f;&#x72;&#x67;&#x2e;&#x74;&#119;">&#x6c;&#x69;&#110;&#116;&#111;&#x6e;&#64;&#x69;&#x69;&#x69;&#x2e;&#x6f;&#x72;&#x67;&#x2e;&#x74;&#119;</a>  ;  <a href="&#x6d;&#97;&#105;&#x6c;&#116;&#111;&#58;&#x6c;&#x69;&#110;&#x74;&#x6f;&#x6e;&#x2e;&#116;&#119;&#x40;&#103;&#109;&#97;&#105;&#x6c;&#46;&#99;&#x6f;&#x6d;">&#x6c;&#x69;&#110;&#x74;&#x6f;&#x6e;&#x2e;&#116;&#119;&#x40;&#103;&#109;&#97;&#105;&#x6c;&#46;&#99;&#x6f;&#x6d;</a></p>
+<p>十分歡迎有在研究 SDN 的朋友一起討論!!<br>Email Address : <a href="&#x6d;&#97;&#x69;&#x6c;&#x74;&#x6f;&#x3a;&#108;&#105;&#110;&#116;&#111;&#110;&#64;&#105;&#105;&#x69;&#46;&#111;&#x72;&#x67;&#46;&#x74;&#x77;">&#108;&#105;&#110;&#116;&#111;&#110;&#64;&#105;&#105;&#x69;&#46;&#111;&#x72;&#x67;&#46;&#x74;&#x77;</a>  ;  <a href="&#x6d;&#x61;&#x69;&#108;&#116;&#111;&#58;&#x6c;&#x69;&#x6e;&#x74;&#x6f;&#110;&#x2e;&#x74;&#119;&#64;&#103;&#109;&#x61;&#105;&#108;&#x2e;&#x63;&#x6f;&#109;">&#x6c;&#x69;&#x6e;&#x74;&#x6f;&#110;&#x2e;&#x74;&#119;&#64;&#103;&#109;&#x61;&#105;&#108;&#x2e;&#x63;&#x6f;&#109;</a></p>
 ]]></content>
     <summary type="html">
     <![CDATA[<h2 id="Continue…">Continue…</h2><hr>
@@ -757,8 +784,8 @@
   
   <entry>
     <title><![CDATA[[筆記] How to set up Ryu controller with GUI component?]]></title>
-    <link href="http://linton.tw/2014/02/11/2014-02-11-note-how-to-set-up-ryu-controller-with-gui-component/"/>
-    <id>http://linton.tw/2014/02/11/2014-02-11-note-how-to-set-up-ryu-controller-with-gui-component/</id>
+    <link href="http://linton.tw/2014/02/11/note-how-to-set-up-ryu-controller-with-gui-component/"/>
+    <id>http://linton.tw/2014/02/11/note-how-to-set-up-ryu-controller-with-gui-component/</id>
     <published>2014-02-10T16:00:00.000Z</published>
     <updated>2014-12-30T01:39:15.000Z</updated>
     <content type="html"><![CDATA[<p>下圖是利用 Ryu 和 mininet 設計的一個簡單網路拓璞（三個switch, 四個host），並且用 Ryu with GUI 顯示在 Web 介面上。<br><img src="http://user-image.logdown.io/user/3997/blog/4047/post/178417/lcREdZ7SyK472OaDcDWP_Ryu_with_GUI.png" alt="Ryu_with_GUI.png"></p>
@@ -820,8 +847,8 @@
   
   <entry>
     <title><![CDATA[[筆記] Ryu controller app - Dumb layer 2 switch]]></title>
-    <link href="http://linton.tw/2014/02/09/2014-02-09-note-ryu-controller-app-dumb-layer-2-switch/"/>
-    <id>http://linton.tw/2014/02/09/2014-02-09-note-ryu-controller-app-dumb-layer-2-switch/</id>
+    <link href="http://linton.tw/2014/02/09/note-ryu-controller-app-dumb-layer-2-switch/"/>
+    <id>http://linton.tw/2014/02/09/note-ryu-controller-app-dumb-layer-2-switch/</id>
     <published>2014-02-08T16:00:00.000Z</published>
     <updated>2014-12-30T01:39:15.000Z</updated>
     <content type="html"><![CDATA[<p>根據 <a href="http://osrg.github.io/ryu/" target="_blank" rel="external">Ryu</a> 所提供的<a href="http://ryu.readthedocs.org/en/latest/writing_ryu_app.html#start-writing" target="_blank" rel="external">官方文件</a>第一個實作的應用程式，他們把它稱為<br><strong>dumb layer 2 switch</strong> 我很好奇為什麼稱呼他為 <strong>dumb layer 2 switch</strong>？</p>
@@ -860,8 +887,8 @@
   
   <entry>
     <title><![CDATA[[Bug] Office for Mac 2011 快捷鍵失效之有效解決方法]]></title>
-    <link href="http://linton.tw/2014/01/31/2014-01-31-bug-office-for-mac-2011-shortcuts-fail/"/>
-    <id>http://linton.tw/2014/01/31/2014-01-31-bug-office-for-mac-2011-shortcuts-fail/</id>
+    <link href="http://linton.tw/2014/01/31/bug-office-for-mac-2011-shortcuts-fail/"/>
+    <id>http://linton.tw/2014/01/31/bug-office-for-mac-2011-shortcuts-fail/</id>
     <published>2014-01-31T08:45:00.000Z</published>
     <updated>2014-12-30T01:39:15.000Z</updated>
     <content type="html"><![CDATA[<p><img src="http://user-image.logdown.io/user/3997/blog/4047/post/177729/Vk89xunLSACIuZoBjd8w_188509.jpg" alt="188509.jpg"></p>
@@ -891,8 +918,8 @@
   
   <entry>
     <title><![CDATA[[筆記] Install Ryu 3.5 - SDN Framework ]]></title>
-    <link href="http://linton.tw/2014/01/11/2014-01-11-install-ryu-3-5-sdn-framework/"/>
-    <id>http://linton.tw/2014/01/11/2014-01-11-install-ryu-3-5-sdn-framework/</id>
+    <link href="http://linton.tw/2014/01/11/install-ryu-3-5-sdn-framework/"/>
+    <id>http://linton.tw/2014/01/11/install-ryu-3-5-sdn-framework/</id>
     <published>2014-01-10T19:58:00.000Z</published>
     <updated>2014-12-30T01:39:15.000Z</updated>
     <content type="html"><![CDATA[<p>在安裝 Ryu 的過程中並沒有像官方網站所說的那麼順利，踩到一些莫名的小地雷在這邊做一下筆記。</p>
@@ -927,7 +954,7 @@
 <figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-<span class="built_in">get</span> install <span class="keyword">python</span>-eventlet <span class="keyword">python</span>-routes <span class="keyword">python</span>-webob <span class="keyword">python</span>-paramiko</span><br></pre></td></tr></table></figure>
 <hr>
 <p>若安裝過程還是有問題，可以寄信給我或是在下面留言與我討論 =)</p>
-<p>十分歡迎有在研究 SDN 的朋友一起討論!!<br>Email Address : <a href="&#x6d;&#97;&#x69;&#x6c;&#116;&#111;&#58;&#108;&#x69;&#x6e;&#116;&#x6f;&#x6e;&#64;&#x69;&#105;&#105;&#46;&#x6f;&#x72;&#103;&#46;&#x74;&#x77;">&#108;&#x69;&#x6e;&#116;&#x6f;&#x6e;&#64;&#x69;&#105;&#105;&#46;&#x6f;&#x72;&#103;&#46;&#x74;&#x77;</a>  ;  <a href="&#109;&#97;&#105;&#108;&#x74;&#111;&#x3a;&#x69;&#x72;&#x65;&#114;&#105;&#x33;&#51;&#x39;&#64;&#x67;&#x6d;&#x61;&#105;&#108;&#x2e;&#99;&#111;&#x6d;">&#x69;&#x72;&#x65;&#114;&#105;&#x33;&#51;&#x39;&#64;&#x67;&#x6d;&#x61;&#105;&#108;&#x2e;&#99;&#111;&#x6d;</a></p>
+<p>十分歡迎有在研究 SDN 的朋友一起討論!!<br>Email Address : <a href="&#x6d;&#x61;&#x69;&#x6c;&#x74;&#x6f;&#58;&#108;&#x69;&#110;&#116;&#111;&#110;&#64;&#x69;&#105;&#105;&#x2e;&#111;&#x72;&#x67;&#x2e;&#116;&#119;">&#108;&#x69;&#110;&#116;&#111;&#110;&#64;&#x69;&#105;&#105;&#x2e;&#111;&#x72;&#x67;&#x2e;&#116;&#119;</a>  ;  <a href="&#109;&#97;&#105;&#108;&#x74;&#111;&#58;&#x69;&#114;&#x65;&#x72;&#x69;&#x33;&#x33;&#57;&#64;&#x67;&#x6d;&#x61;&#x69;&#108;&#x2e;&#x63;&#111;&#x6d;">&#x69;&#114;&#x65;&#x72;&#x69;&#x33;&#x33;&#57;&#64;&#x67;&#x6d;&#x61;&#x69;&#108;&#x2e;&#x63;&#111;&#x6d;</a></p>
 ]]></content>
     <summary type="html">
     <![CDATA[<p>在安裝 Ryu 的過程中並沒有像官方網站所說的那麼順利，踩到一些莫名的小地雷在這邊做一下筆記。</p>
@@ -946,69 +973,6 @@
       <category term="Ryu" scheme="http://linton.tw/tags/Ryu/"/>
     
       <category term="SDN" scheme="http://linton.tw/tags/SDN/"/>
-    
-  </entry>
-  
-  <entry>
-    <title><![CDATA[Raspberry Pi X SHT15 溫濕度偵測]]></title>
-    <link href="http://linton.tw/2013/12/03/2013-12-03-raspberry-pi-x-sht15-humidity-detection/"/>
-    <id>http://linton.tw/2013/12/03/2013-12-03-raspberry-pi-x-sht15-humidity-detection/</id>
-    <published>2013-12-03T01:26:00.000Z</published>
-    <updated>2014-12-30T01:39:15.000Z</updated>
-    <content type="html"><![CDATA[<h3 id="Raspberry_Pi_(樹莓派)">Raspberry Pi (樹莓派)</h3><hr>
-<p><a href="http://www.raspberrypi.org/" target="_blank" rel="external">Raspberry Pi</a> 是一台信用卡般大小的小型電腦，上面可以搭載 Linux 作業系統，它由英國的樹莓派基金會所開發，目的是以低價硬體及自由軟體刺激在學校的基本的電腦科學教育。除了與一般電腦一樣具備USB Port, HDMI, Ethernet, SD Slot 等等之外，特別的是在這個平台上提供 26 個腳位可以做簡單的控制，透過 C, Python, Java 等程式語言的第三方函式庫供開發者做一個簡單的原型開發。</p>
-<p><a href="http://www.flickr.com/photos/98836972@N05/11175565574/" title="Flickr 上 哲緯林 的 IMG_9473" target="_blank" rel="external"><img src="http://farm3.staticflickr.com/2889/11175565574_77ca80ab50_c.jpg" width="800" height="534" alt="IMG_9473"></a></p>
-<a id="more"></a>
-<h3 id="SHT15_溫濕度感測模組">SHT15 溫濕度感測模組</h3><hr>
-<p>SHT15 是一個數位的溫濕度感知器，可以偵測環境中溫度與濕度。本文將使用 SHT15 與 Raspberry Pi 的 GPIO 做連結，來偵測環境中的溫濕度。</p>
-<p><a href="http://www.flickr.com/photos/98836972@N05/11175577904/" title="Flickr 上 哲緯林 的 IMG_9470" target="_blank" rel="external"><img src="http://farm6.staticflickr.com/5515/11175577904_7c68fc5188_c.jpg" width="800" height="534" alt="IMG_9470"></a></p>
-<h3 id="事前準備工作">事前準備工作</h3><hr>
-<ol>
-<li>硬體部分<ul>
-<li>Raspberry Pi<ul>
-<li>SHT15</li>
-<li>麵包板</li>
-<li>若干跳線</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>軟體部分<ul>
-<li>Python 2.7<ul>
-<li>RPi.GPIO 套件</li>
-<li>rpiSht1x 套件</li>
-</ul>
-</li>
-</ul>
-</li>
-</ol>
-<p>此次使用 Python 的 <a href="https://pypi.python.org/pypi/RPi.GPIO/0.5.3a" target="_blank" rel="external">RPi.GPIO</a> 搭配 <a href="https://pypi.python.org/pypi/rpiSht1x" target="_blank" rel="external">rpiSht1x</a> 函式庫來偵測環境中溫濕度，可以使用 <code>pip install</code> 來安裝該套件。</p>
-<h3 id="實做流程">實做流程</h3><hr>
-<h4 id="硬體接線">硬體接線</h4><p>SHT15 腳位有VCC, GND, SCK, DATA 將 VCC 接到 Raspberry Pi 的腳位2、GND 接腳位6、SCK 接腳位7、DATA 接腳位11。</p>
-<p>請參考 Raspberry Pi 腳位圖<br><img src="http://pi4j.com/images/gpio-control-example-large.png" alt="pin.png"></p>
-<p>實際接線圖<br><a href="http://www.flickr.com/photos/98836972@N05/11175811893/" title="Flickr 上 哲緯林 的 IMG_9476" target="_blank" rel="external"><img src="http://farm4.staticflickr.com/3730/11175811893_f68e1edaca_c.jpg" width="800" height="534" alt="IMG_9476"></a></p>
-<h4 id="軟體程式_(Python_Source_code)">軟體程式 (Python Source code)</h4><p>程式功能為<code>每5秒</code>偵測一次環境溫濕度，並顯示。</p>
-<figure class="highlight"><figcaption><span>hygro.py</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">import time</span><br><span class="line">import datetime</span><br><span class="line">import sys</span><br><span class="line">from sht1x.Sht1x import Sht1x as SHT1x</span><br><span class="line"></span><br><span class="line">dataPin = 11</span><br><span class="line">clkPin = 7</span><br><span class="line">sht1x = SHT1x(dataPin, clkPin, SHT1x.GPIO_BOARD)</span><br><span class="line"></span><br><span class="line">def detect():</span><br><span class="line">    t = time.time()</span><br><span class="line">    current_time = time.strftime('%H:%M:%S', time.localtime(t))</span><br><span class="line">    temperature = sht1x.read_temperature_C()</span><br><span class="line">    humidity = sht1x.read_humidity()</span><br><span class="line">    dewPoint = sht1x.calculate_dew_point(temperature, humidity)</span><br><span class="line">    return current_time, round(temperature,2), round(humidity,2), round(dewPoint,2)</span><br><span class="line"></span><br><span class="line">def main():</span><br><span class="line">    while True:</span><br><span class="line">        try:</span><br><span class="line">            (current_time, temperature, humidity, dewPoint) = detect()</span><br><span class="line">            print("Time:%s  Temperature:%2.1f`C  Humidity:%2.2f%%  </span><br><span class="line">            	Dew Point:%2.1f`C" %(current_time, temperature, humidity, dewPoint))</span><br><span class="line">            time.sleep(5)</span><br><span class="line">        except KeyboardInterrupt, e:</span><br><span class="line">            print e</span><br><span class="line">            sys.exit()</span><br><span class="line"></span><br><span class="line">if __name__ == '__main__':</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
-<h3 id="展示照片">展示照片</h3><hr>
-<p>因為 Raspberry Pi 有 USB Port 可以接 Wi-Fi USB Adapters，此外因為他的耗電量極小，可以接上可以供給 2A 電流的行動電源，將整個裝置脫離插頭、網路分享器，放到我想放的地方。</p>
-<p>例如：最近購買電子防潮箱，想來測試一下濕度計夠不夠精準。</p>
-<p>供給 2A 電流的行動電源<br><a href="http://www.flickr.com/photos/98836972@N05/11175651536/" title="Flickr 上 哲緯林 的 IMG_9478" target="_blank" rel="external"><img src="http://farm8.staticflickr.com/7313/11175651536_f5894e5d50_c.jpg" width="800" height="534" alt="IMG_9478"></a></p>
-<p>脫離有線網路，採用 Wi-Fi USB Adapters<br><a href="http://www.flickr.com/photos/98836972@N05/11175638196/" title="Flickr 上 哲緯林 的 IMG_9483" target="_blank" rel="external"><img src="http://farm6.staticflickr.com/5535/11175638196_6d08ac245c_c.jpg" width="800" height="534" alt="IMG_9483"></a></p>
-<p>放入電子防潮箱，透過 SSH 可以取得溫濕度資料<br><a href="http://www.flickr.com/photos/98836972@N05/11175651484/" title="Flickr 上 哲緯林 的 IMG_9489" target="_blank" rel="external"><img src="http://farm4.staticflickr.com/3737/11175651484_6895c23515_c.jpg" width="800" height="534" alt="IMG_9489"></a></p>
-<p>透過 SSH 我可以遠端連線上 Raspberry Pi 並執行程式，可以取得溫濕度。<br>此張照片是 Raspberry Pi 從防潮箱拿出來的記錄，可以很明顯地看見，濕度提高了接近 10%<br><a href="http://www.flickr.com/photos/98836972@N05/11175611134/" title="Flickr 上 哲緯林 的 IMG_9492" target="_blank" rel="external"><img src="http://farm8.staticflickr.com/7312/11175611134_672ac5489d_c.jpg" width="800" height="534" alt="IMG_9492"></a></p>
-]]></content>
-    <summary type="html">
-    <![CDATA[<h3 id="Raspberry_Pi_(樹莓派)">Raspberry Pi (樹莓派)</h3><hr>
-<p><a href="http://www.raspberrypi.org/">Raspberry Pi</a> 是一台信用卡般大小的小型電腦，上面可以搭載 Linux 作業系統，它由英國的樹莓派基金會所開發，目的是以低價硬體及自由軟體刺激在學校的基本的電腦科學教育。除了與一般電腦一樣具備USB Port, HDMI, Ethernet, SD Slot 等等之外，特別的是在這個平台上提供 26 個腳位可以做簡單的控制，透過 C, Python, Java 等程式語言的第三方函式庫供開發者做一個簡單的原型開發。</p>
-<p><a href="http://www.flickr.com/photos/98836972@N05/11175565574/" title="Flickr 上 哲緯林 的 IMG_9473"><img src="http://farm3.staticflickr.com/2889/11175565574_77ca80ab50_c.jpg" width="800" height="534" alt="IMG_9473"></a></p>]]>
-    
-    </summary>
-    
-      <category term="Python" scheme="http://linton.tw/tags/Python/"/>
-    
-      <category term="Raspberry Pi" scheme="http://linton.tw/tags/Raspberry-Pi/"/>
-    
-      <category term="SHT15" scheme="http://linton.tw/tags/SHT15/"/>
     
   </entry>
   
